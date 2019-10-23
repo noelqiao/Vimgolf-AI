@@ -28,12 +28,18 @@ def main(start_file, end_file, scriptout):
     env = environment(start_file)
     tempfile = env.createStartFile()
 
-    subprocess.call([EDITOR, tempfile, '-W', scriptout], stdin=)
-    press('d')
-    press('d')
+    vim = Process(target = lambda: subprocess.call([EDITOR, tempfile, '-W', scriptout]))
+    vim.start()
+    #subprocess.call([EDITOR, tempfile, '-W', scriptout], stdin=)
+    press('i')
+    typewrite('Hello World')
+    press('esc')
+#    press('d')
+#    press('d')
     press(':')
+    press('w')
     press('q')
-    press('!')
+    press('enter')
     print('Are we here')
     # Try and run vim with subprocesses
 #    with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
