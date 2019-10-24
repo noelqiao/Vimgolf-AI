@@ -21,14 +21,14 @@ class environment:
             for line in self.text_list:
                 tmp.write(str.encode(line))
             tmp.flush()
-        return tmp.name
+        return tmp
 
 def main(start_file, end_file, scriptout):
     # Create environment with the contents of the start file
     env = environment(start_file)
     tempfile = env.createStartFile()
 
-    vim = Process(target = lambda: subprocess.call([EDITOR, tempfile, '-W', scriptout]))
+    vim = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-W', scriptout]))
     vim.start()
     #subprocess.call([EDITOR, tempfile, '-W', scriptout], stdin=)
     press('i')
@@ -36,11 +36,23 @@ def main(start_file, end_file, scriptout):
     press('esc')
 #    press('d')
 #    press('d')
+    press('y')
+    press('y')
+    press('p')
+    press('f')
+    press('-')
+    press('i')
+    press('backspace')
+    press('backspace')
+    press('backspace')
+    press('backspace')
+    press('backspace')
+    press('esc')
     press(':')
     press('w')
     press('q')
     press('enter')
-    print('Are we here')
+    tempfile.close()
     # Try and run vim with subprocesses
 #    with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
 #        with open(start_file, 'r') as start:
@@ -48,6 +60,8 @@ def main(start_file, end_file, scriptout):
 #            tmp.write(line)
 #        tmp.flush()
 #        subprocess.call([EDITOR, tmp.name])
+    print('Are we here')
+    print('more {}'.format(tempfile.name))
       
 
 if __name__ == '__main__':

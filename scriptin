@@ -1,4 +1,1 @@
-2dd:%s/,/\r/g
-:g/^$/d
-:echo line('.')
-:q!
+2dd:%s/,/\r/g:g/^$/d:echo line('.')i'Hello, World!'I'm a babyi<BS><BS>
