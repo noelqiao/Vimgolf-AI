@@ -8,6 +8,15 @@ print('Hello, World!')
 vim_commands_list = ['h', 'j', 'k', 'l', 'i', 'I', 'a', 'A', 'o', 'O', 's', 'S',
                      '.', 'b', 'db', 'w', 'dw', 'e', 'de', 'yy', 'p', 'x',
                      ':']
+keyboard_commands = ['\t', ' ', '!', '"', '#', '$', '%', '&', "'", '(',
+                     ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7',
+                     '8', '9', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`',
+                     'a', 'b', 'c', 'd', 'e','f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+                     'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', 
+                     'backspace', 'capslock', 'ctrl', 'ctrlleft', 'ctrlright', 'del', 'delete',
+                     'down', 'enter', 'esc', 'escape', 'help', 'home', 'insert', 'left', 'return',
+                     'right', 'shift', 'shiftleft', 'shiftright', 'space', 'tab', 'up', 'command',
+                     'option', 'optionleft', 'optionright']
 
 EDITOR = os.environ.get('EDITOR', 'vim')
 
