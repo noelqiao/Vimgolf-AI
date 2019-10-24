@@ -5,6 +5,9 @@ from multiprocessing import Process
 from pyautogui import press, typewrite
 
 print('Hello, World!')
+vim_commands_list = ['h', 'j', 'k', 'l', 'i', 'I', 'a', 'A', 'o', 'O', 's', 'S',
+                     '.', 'b', 'db', 'w', 'dw', 'e', 'de', 'yy', 'p', 'x',
+                     ':']
 
 EDITOR = os.environ.get('EDITOR', 'vim')
 
