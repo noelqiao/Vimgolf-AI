@@ -62,13 +62,22 @@ def main(start_file, end_file, scriptout):
     press('esc')
     #typewrite(':echo eval(line2byte(line("."))+col("."))')
     #press('enter')
-    typewrite(':redir! > vimout | echo line(".") | redir END')
+    typewrite('jl')
+    typewrite(':set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
     press('enter')
     press(':')
     press('w')
     press('q')
     press('enter')
     tempfile.close()
+
+    coords = []
+    with open('posout', 'r') as posfile:
+        for line in posfile:
+            line = line.strip()
+            if line:
+                coords.append(line)
+    print(coords)
     # Try and run vim with subprocesses
 #    with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
 #        with open(start_file, 'r') as start:

@@ -1,5 +1,6 @@
 # Vimgolf Files
 scriptout
+posout
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
