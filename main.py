@@ -4,6 +4,10 @@ import sys, os
 from multiprocessing import Process
 from pyautogui import press, typewrite
 
+# Our modules
+import testWriteSpecChar as tWSC
+import modetrack
+
 print('Hello, World!')
 vim_commands_list = ['h', 'j', 'k', 'l', 'i', 'I', 'a', 'A', 'o', 'O', 's', 'S',
                      '.', 'b', 'db', 'w', 'dw', 'e', 'de', 'yy', 'p', 'x',
@@ -39,37 +43,15 @@ def main(start_file, end_file, scriptout):
     # Create environment with the contents of the start file
     env = environment(start_file)
     tempfile = env.createStartFile()
-
-    vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-W', scriptout]))
-    vimgolf.start()
-    #subprocess.call([EDITOR, tempfile, '-W', scriptout], stdin=)
-    press('i')
-    typewrite('Hello World')
-    press('esc')
-#    press('d')
-#    press('d')
-    press('y')
-    press('y')
-    press('p')
-    press('f')
-    press('-')
-    press('i')
-    press('backspace')
-    press('backspace')
-    press('backspace')
-    press('backspace')
-    press('backspace')
-    press('esc')
-    #typewrite(':echo eval(line2byte(line("."))+col("."))')
-    #press('enter')
-    typewrite('jl')
-    typewrite(':set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
-    press('enter')
-    press(':')
-    press('w')
-    press('q')
-    press('enter')
-    tempfile.close()
+    
+    master_command_list = ['i', '`esc', 'd', 'd', 'y', 'y', 'p', 'f', '-', 'i', '`bac', '`bac', '`bac', '`esc', ':', 'q', '!', '`ent']
+    print('Number of commands (cost):  {}'.format(len(master_command_list)))
+    # Create the script in here
+    master_command_string = ''.join(master_command_list)
+    scriptin = 'scriptin.test'
+    tWSC.writeChars(scriptin, master_command_string)
+    modelist = modetrack.fun(master_command_list)
+    print(modelist)
 
     coords = []
     with open('posout', 'r') as posfile:
@@ -78,6 +60,17 @@ def main(start_file, end_file, scriptout):
             if line:
                 coords.append(line)
     print(coords)
+
+    vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
+    vimgolf.start()
+
+    # For reference
+#    press('Esc')
+#    typewrite(':w | :set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
+#    press('enter')
+
+    tempfile.close()
+
     # Try and run vim with subprocesses
 #    with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
 #        with open(start_file, 'r') as start:

@@ -4,7 +4,7 @@ def writeChars(theFile,text):
 	s = ""
 	ite = 0
 	while ite < len(text):
-		if text[ite] == "|":
+		if text[ite] == "`":
 			specChar = text[ite+1:ite+4]
 			if specChar == "ent":
 				temp = u"\u000a"#line feed

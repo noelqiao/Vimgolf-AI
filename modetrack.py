@@ -4,8 +4,8 @@ def fun(keystrokes):
     # requires input to be in the form of a list like ['i', ':', '<Esc>']
     v2i = ['a', 'A', 'i', 'I', 'o', 'O', 's', 'S']
     v2c = [':']
-    i2v = ['<Esc>']
-    c2v = ['<Enter>', '<Esc>']
+    i2v = ['`esc']
+    c2v = ['`ent', '`esc']
     idx = 0
     currentMode = 'v'
     modeList = []
@@ -23,7 +23,7 @@ def fun(keystrokes):
             if keystrokes[idx] in c2v:
                 currentMode = 'v';
         if currentMode == 'c':
-            if keystrokes[idx] == '<BS>':
+            if keystrokes[idx] == '`bac':
                 cCount = cCount - 1
             else:
                 cCount = cCount + 1
