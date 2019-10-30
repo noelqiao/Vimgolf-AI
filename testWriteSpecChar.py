@@ -12,6 +12,9 @@ def writeChars(theFile,text):
 			if specChar == "bac":
 				temp = u"\u007f"#delete
 				s = s + temp
+			if specChar == "esc":
+				temp = u"\u001b"#escape
+				s = s + temp
 			ite = ite + 3
 		else:
 			s = s + text[ite]
