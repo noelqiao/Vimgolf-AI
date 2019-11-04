@@ -1,6 +1,10 @@
 #! /usr/bin/python3
 import tempfile, subprocess
 import sys, os
+import queue
+import numpy as np
+import time
+import filecmp
 from multiprocessing import Process
 from pyautogui import press, typewrite
 
@@ -30,60 +34,111 @@ class environment:
         with open(start_file, 'r') as file:
             for line in file:
                 text_list.append(line)
-        self.text_list =  text_list
+        self.text_list = text_list
 
-    def createStartFile(self):
+    def setup(self):
         with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
             for line in self.text_list:
                 tmp.write(str.encode(line))
             tmp.flush()
         return tmp
 
-def main(start_file, end_file, scriptout):
-    # Create environment with the contents of the start file
-    env = environment(start_file)
-    tempfile = env.createStartFile()
-    
-    master_command_list = ['i', '`esc', 'd', 'd', 'y', 'y', 'p', 'f', '-', 'i', '`bac', '`bac', '`bac', '`esc', ':', 'q', '!', '`ent']
-    print('Number of commands (cost):  {}'.format(len(master_command_list)))
-    # Create the script in here
-    master_command_string = ''.join(master_command_list)
-    scriptin = 'scriptin.test'
-    tWSC.writeChars(scriptin, master_command_string)
-    modelist = modetrack.fun(master_command_list)
-    print(modelist)
+def main(attempts, start_file, end_file, scriptout):
+    # Iterate over the number of attempts
+    for i in range(0, attempts):
+        # Create environment with the contents of the start file
+        env = environment(start_file)
+        q = queue.Queue()
+        golfing = True
 
-    coords = []
-    with open('posout', 'r') as posfile:
-        for line in posfile:
-            line = line.strip()
-            if line:
-                coords.append(line)
-    print(coords)
+        # For reference/testing
+        #master_command_list = ['i', '`esc', 'd', 'd', 'y', 'y', 'p', 'f', '-', 'i', '`bac', '`bac', '`bac', '`esc', ':', 'q', '!', '`ent', 'DONE']
+        master_command_list = ['d', 'j', 'q', 'q', 'f', ',', 'r', '`ent', 'q', '2', '@', 'q', 'l', 'x', 'j', '3', '@', 'q', 'd', 'd', '3', '@', 'q', 'd', 'd']
+        for command in master_command_list:
+            q.put(command)
 
-    vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
-    vimgolf.start()
+        command_list = [] 
+        same_files = False
+        while golfing:
+            if command_list:
+                tempfile = env.setup()
+                #time.sleep(1)
+                print('Number of commands (cost):  {}'.format(len(command_list)))
 
-    # For reference
-#    press('Esc')
-#    typewrite(':w | :set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
-#    press('enter')
+                # Create the script in here
+                command_string = ''.join(command_list)
+                scriptin = 'scriptin'
+                tWSC.writeChars(scriptin, command_string)
+#                with(open('scriptin', 'r')) as f:
+#                    for line in f:
+#                        print(line)
+                modelist = modetrack.fun(command_list)
+                print(command_list)
+                print(modelist)
 
-    tempfile.close()
+                # Run through the commands
+#                vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
+#                vimgolf.start()
+                subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout])
 
-    # Try and run vim with subprocesses
-#    with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
-#        with open(start_file, 'r') as start:
-#            line = str.encode(start.readline())
-#            tmp.write(line)
-#        tmp.flush()
-#        subprocess.call([EDITOR, tmp.name])
-    print('Are we here')
-    print('more {}'.format(tempfile.name))
+                #time.sleep(0.1)
+
+                tempfile.close()
+                if filecmp.cmp(tempfile.name, end_file):
+                    same_files = True
+
+                # Check if files are the same
+
+            #    print('more {}'.format(tempfile.name))
+                print('')
+                os.system('more {}'.format(tempfile.name))
+
+                os.remove(tempfile.name)
+                #print('\nTemp file removed')
+                # Get a new command if queue is empty
+
+            coords = []
+            if command_list:
+                with open('posout', 'r') as posfile:
+                    for line in posfile:
+                        line = line.strip()
+                        if line:
+                            coords.append(line)
+            else:
+                coords.append(1)
+                coords.append(1)
+            print('\n',coords, '\n')
+            print('=======================================')
+
+            if q.empty():
+                if same_files:
+                    next_command = 'DONE'
+                else:
+                    next_command = 'y'
+            # Fetch one from the queue
+            else:
+                next_command = q.get()
+            command_list.append(next_command)
+            
+            if next_command == 'DONE':
+                golfing = False
+
+        # Final Output
+        print('\n\nFinal Output for iteration {}'.format(i))
+        print('Number of commands (cost):  {}'.format(len(command_list) + 2))
+        print('AI\'s commands:')
+        print(command_list)
+
+            # For reference
+        #    press('Esc')
+        #    typewrite(':w | :set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
+        #    press('enter')
+
       
 
 if __name__ == '__main__':
-    print(sys.argv[1])
-    print(sys.argv[2])
-    print(sys.argv[3])
-    main(sys.argv[1], sys.argv[2], sys.argv[3])
+#    print(sys.argv[1])
+#    print(sys.argv[2])
+#    print(sys.argv[3])
+    #main(sys.argv[1], sys.argv[2], sys.argv[3])
+    main(1, 'start.txt', 'end.txt', 'scriptout')

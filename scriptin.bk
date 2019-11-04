@@ -1,1 +1,0 @@
-2dd:%s/,/\r/g^M:g/^$/d^M:echo line('.')^Mi'Hello, World!'^MI'm a baby^[:q!^M

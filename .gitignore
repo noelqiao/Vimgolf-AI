@@ -1,6 +1,8 @@
 # Vimgolf Files
 scriptout
 posout
+test7.txt
+.swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
