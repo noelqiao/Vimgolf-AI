@@ -125,7 +125,7 @@ def main(attempts, start_file, end_file, scriptout):
 
         # Final Output
         print('\n\nFinal Output for iteration {}'.format(i))
-        print('Number of commands (cost):  {}'.format(len(command_list) + 2))
+        print('Number of commands (cost):  {}'.format(len(command_list) + 1))
         print('AI\'s commands:')
         print(command_list)
 
