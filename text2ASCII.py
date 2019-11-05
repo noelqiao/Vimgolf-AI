@@ -25,8 +25,10 @@ def ascii2AsciiArray(arr,rows,cols):
 			if arr[i] == 10:
 				skipping = False
 	return newArr	
+def text2AsciiArray(string,rows,cols):
+	arr = t2a(string)
+	finArr = ascii2AsciiArray(arr,rows,cols)
+	return finArr
 s = codecs.open("test.txt", "r", "utf-8")
 s = s.read()
-print(t2a(s))
-
-print(ascii2AsciiArray(t2a(s),7,7))
+print(text2AsciiArray(s,10,10))
