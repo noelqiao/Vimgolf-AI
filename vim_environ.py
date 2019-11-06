@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 # Copyright 2018 Tensorforce Team. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +34,9 @@ class VimEnviron(Environment):
             (<span style="color:#C00000"><b>required</b></span>).
         visualize (bool): Whether to visualize interaction
             (<span style="color:#00C000"><b>default</b></span>: false).
+
+
+    WE NEED TO WRITE OUR OWN VIM ENVIRONMENT CLASS
     """
 
     @classmethod
@@ -41,12 +45,13 @@ class VimEnviron(Environment):
 
         return list(range(len(mazeexp.engine.config.modes)))
 
-    def __init__(self, level, visualize=False):
-        import mazeexp
+    def __init__(self, challenge, visualize=False):
+        import vimexp
 
-        assert level in MazeExplorer.levels()
+        #assert level in MazeExplorer.levels()
 
-        self.environment = mazeexp.MazeExplorer(mode_id=level, visible=visualize)
+        #self.environment = mazeexp.MazeExplorer(mode_id=level, visible=visualize)
+        self.environment = vimexp.VimGolfer(challenge=challenge, visible=visualize)
 
     def __str__(self):
         return super().__str__() + '({})'.format(self.environment.mode_id)
@@ -59,6 +64,7 @@ class VimEnviron(Environment):
         return dict(type='float', shape=shape)
 
     def actions(self):
+        print(dict(type='int', num_actions=self.environment.actions_num))
         return dict(type='int', num_actions=self.environment.actions_num)
 
     def close(self):
@@ -71,3 +77,7 @@ class VimEnviron(Environment):
     def execute(self, actions):
         state, reward, terminal, _ = self.environment.act(action=actions)
         return state, terminal, reward
+
+if __name__ == '__main__':
+    vim_environ = VimEnviron('OneNumberPerLine')
+    vim_environ.actions()
