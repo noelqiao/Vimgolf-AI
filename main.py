@@ -5,6 +5,7 @@ import queue
 import numpy as np
 import time
 import filecmp
+import random
 from multiprocessing import Process
 from pyautogui import press, typewrite
 
@@ -29,25 +30,110 @@ keyboard_commands = ['\t', ' ', '!', '"', '#', '$', '%', '&', "'", '(',
 EDITOR = os.environ.get('EDITOR', 'vim')
 
 class environment:
-    def __init__(self, start_file):
+    def __init__(self, start_file, end_file):
         text_list = []
+        self.start_file = start_file
+        self.end_file = end_file
         with open(start_file, 'r') as file:
             for line in file:
                 text_list.append(line)
         self.text_list = text_list
+        self.normal_mode = [[' '], ['!'], ['"'], ['#'], ['$'], ['%'], ['&'], ["'"], ['('],
+                     [')'], ['*'], ['+'], [','], ['-'], ['.'], ['/'], ['0'], ['1'], ['2'], ['3'], ['4'], 
+                     ['5'], ['6'], ['7'], ['8'], ['9'], [':'], [';'], ['<'], ['='], ['>'], ['?'], ['@'],
+                     ['['], ['\\'], [']'], ['^'], ['_'], ['`'], ['a'], ['b'], ['c'], ['d'], ['e'],['f'],
+                     ['g'], ['h'], ['i'], ['j'], ['k'], ['l'], ['m'], ['n'], ['o'], ['p'], ['q'], ['r'],
+                     ['s'], ['t'], ['u'], ['v'], ['w'], ['x'], ['y'], ['z'], ['{'], ['|'], ['}'], ['~'], 
+                     ['A'], ['B'], ['C'], ['D'], ['E'],['F'], ['G'], ['H'], ['I'], ['J'], ['K'], ['L'],
+                     ['M'], ['N'], ['O'], ['P'], ['Q'], ['R'], ['S'], ['T'], ['U'], ['V'], ['W'], ['X'],
+                     ['Y'], ['Z'],
+                     ['`bac'], ['`ent'], ['`esc'], ['d', 'w'], ['d', 'd'], ['d', 'b'], ['d', 'e'], ['y', 'y']
+                     ]
+        self.visual_mode = [[' '], ['!'], ['"'], ['#'], ['$'], ['%'], ['&'], ["'"], ['('],
+                     [')'], ['*'], ['+'], [','], ['-'], ['.'], ['/'], ['0'], ['1'], ['2'], ['3'], ['4'], 
+                     ['5'], ['6'], ['7'], ['8'], ['9'], [':'], [';'], ['<'], ['='], ['>'], ['?'], ['@'],
+                     ['['], ['\\'], [']'], ['^'], ['_'], ['`'], ['a'], ['b'], ['c'], ['d'], ['e'],['f'],
+                     ['g'], ['h'], ['i'], ['j'], ['k'], ['l'], ['m'], ['n'], ['o'], ['p'], ['q'], ['r'],
+                     ['s'], ['t'], ['u'], ['v'], ['w'], ['x'], ['y'], ['z'], ['{'], ['|'], ['}'], ['~'], 
+                     ['A'], ['B'], ['C'], ['D'], ['E'],['F'], ['G'], ['H'], ['I'], ['J'], ['K'], ['L'],
+                     ['M'], ['N'], ['O'], ['P'], ['Q'], ['R'], ['S'], ['T'], ['U'], ['V'], ['W'], ['X'],
+                     ['Y'], ['Z'],
+                     ['`bac'], ['`ent'], ['`esc']
+                     ]
+        self.insertion_mode = [[' '], ['!'], ['"'], ['#'], ['$'], ['%'], ['&'], ["'"], ['('],
+                     [')'], ['*'], ['+'], [','], ['-'], ['.'], ['/'], ['0'], ['1'], ['2'], ['3'], ['4'], 
+                     ['5'], ['6'], ['7'], ['8'], ['9'], [':'], [';'], ['<'], ['='], ['>'], ['?'], ['@'],
+                     ['['], ['\\'], [']'], ['^'], ['_'], ['`'], ['a'], ['b'], ['c'], ['d'], ['e'],['f'],
+                     ['g'], ['h'], ['i'], ['j'], ['k'], ['l'], ['m'], ['n'], ['o'], ['p'], ['q'], ['r'],
+                     ['s'], ['t'], ['u'], ['v'], ['w'], ['x'], ['y'], ['z'], ['{'], ['|'], ['}'], ['~'], 
+                     ['A'], ['B'], ['C'], ['D'], ['E'],['F'], ['G'], ['H'], ['I'], ['J'], ['K'], ['L'],
+                     ['M'], ['N'], ['O'], ['P'], ['Q'], ['R'], ['S'], ['T'], ['U'], ['V'], ['W'], ['X'],
+                     ['Y'], ['Z'],
+                     ['`bac'], ['`ent'], ['`esc']
+                     ]
+        self.command_mode = [[' '], ['!'], ['"'], ['#'], ['$'], ['%'], ['&'], ["'"], ['('],
+                     [')'], ['*'], ['+'], [','], ['-'], ['.'], ['/'], ['0'], ['1'], ['2'], ['3'], ['4'], 
+                     ['5'], ['6'], ['7'], ['8'], ['9'], [':'], [';'], ['<'], ['='], ['>'], ['?'], ['@'],
+                     ['['], ['\\'], [']'], ['^'], ['_'], ['`'], ['a'], ['b'], ['c'], ['d'], ['e'],['f'],
+                     ['g'], ['h'], ['i'], ['j'], ['k'], ['l'], ['m'], ['n'], ['o'], ['p'], ['q'], ['r'],
+                     ['s'], ['t'], ['u'], ['v'], ['w'], ['x'], ['y'], ['z'], ['{'], ['|'], ['}'], ['~'], 
+                     ['A'], ['B'], ['C'], ['D'], ['E'],['F'], ['G'], ['H'], ['I'], ['J'], ['K'], ['L'],
+                     ['M'], ['N'], ['O'], ['P'], ['Q'], ['R'], ['S'], ['T'], ['U'], ['V'], ['W'], ['X'],
+                     ['Y'], ['Z'],
+                     ['`bac'], ['`ent'], ['`esc']
+                     ]
 
     def setup(self):
         with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
             for line in self.text_list:
                 tmp.write(str.encode(line))
             tmp.flush()
+        self.tempfile = tmp
         return tmp
+
+    # Return a reward for an action given a state
+    def getReward(self):
+        pass
+
+    # Return an action for a given state
+    def getAction(self, mode):
+        # Random percent chance of choosing an action for exploration
+        if random.random() <= 0.10:
+            rand_index = random.randint(0, len(mode))
+            if mode == 'v':
+                action = self.visual_mode[rand_index]
+            if mode == 'n':
+                action = self.normal_mode[rand_index]
+            if mode == 'i':
+                action = self.insertion_mode[rand_index]
+            if mode == 'c':
+                action = self.command_mode[rand_index]
+        # Else, use a method based around cost/etc
+        else:
+            pass
+        print(rand_index)
+        print(action)
+        return action
+
+    def fileCompare(self):
+        # Check if files are the same
+        if filecmp.cmp(self.tempfile.name, self.end_file):
+            return True
+        else:
+            return False
+
+    def cleanUp(self):
+        self.tempfile.close()
+        os.remove(self.tempfile.name)
+        print('Closed and removed the temp file')
+        return
+
 
 def main(attempts, start_file, end_file, scriptout):
     # Iterate over the number of attempts
     for i in range(0, attempts):
         # Create environment with the contents of the start file
-        env = environment(start_file)
+        env = environment(start_file, end_file)
         q = queue.Queue()
         golfing = True
 
@@ -81,21 +167,14 @@ def main(attempts, start_file, end_file, scriptout):
 #                vimgolf.start()
                 subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout])
 
-                #time.sleep(0.1)
-
-                tempfile.close()
-                if filecmp.cmp(tempfile.name, end_file):
-                    same_files = True
-
                 # Check if files are the same
+                same_files = env.fileCompare()
 
-            #    print('more {}'.format(tempfile.name))
-                print('')
+                print('=================Start of File=================')
                 os.system('more {}'.format(tempfile.name))
+                print('==================End of File==================')
+                env.cleanUp()
 
-                os.remove(tempfile.name)
-                #print('\nTemp file removed')
-                # Get a new command if queue is empty
 
             coords = []
             if command_list:
@@ -107,14 +186,14 @@ def main(attempts, start_file, end_file, scriptout):
             else:
                 coords.append(1)
                 coords.append(1)
-            print('\n',coords, '\n')
-            print('=======================================')
+            print('Ending coords: {}\n\n'.format(coords))
 
+            # Get a new command if queue is empty
             if q.empty():
                 if same_files:
                     next_command = 'DONE'
                 else:
-                    next_command = 'y'
+                    next_command = env.getAction()
             # Fetch one from the queue
             else:
                 next_command = q.get()
@@ -124,7 +203,7 @@ def main(attempts, start_file, end_file, scriptout):
                 golfing = False
 
         # Final Output
-        print('\n\nFinal Output for iteration {}'.format(i))
+        print('\nFinal Output for iteration {}'.format(i))
         print('Number of commands (cost):  {}'.format(len(command_list) + 1))
         print('AI\'s commands:')
         print(command_list)
