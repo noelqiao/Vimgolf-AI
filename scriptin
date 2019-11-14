@@ -1,1 +1,0 @@
-i:w | set cmdheight=3 | redir! > posout | echo line('.') | echo col('.') | redir END:q

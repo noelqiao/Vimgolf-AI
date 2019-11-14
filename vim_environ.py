@@ -39,11 +39,11 @@ class VimEnviron(Environment):
     WE NEED TO WRITE OUR OWN VIM ENVIRONMENT CLASS
     """
 
-    @classmethod
-    def levels(cls):
-        import mazeexp
-
-        return list(range(len(mazeexp.engine.config.modes)))
+#    @classmethod
+#    def levels(cls):
+#        import mazeexp
+#
+#        return list(range(len(mazeexp.engine.config.modes)))
 
     def __init__(self, challenge, visualize=False, numSteps=None):
         import vimexp
@@ -52,7 +52,7 @@ class VimEnviron(Environment):
 
         #self.environment = mazeexp.MazeExplorer(mode_id=level, visible=visualize)
         self.environment = vimexp.VimGolfer(challenge=challenge, visible=visualize)
-		self.num_steps = numSteps
+        self.num_steps = numSteps
 
     def __str__(self):
         return super().__str__() + '({})'.format(self.environment.mode_id)
@@ -75,8 +75,8 @@ class VimEnviron(Environment):
     def execute(self, actions):
         state, reward, terminal, _ = self.environment.act(action=actions)
         return state, terminal, reward
-	def max_episode_timesteps(self):
-		return self.num_steps
+    def max_episode_timesteps(self):
+        return self.num_steps
 
 
 if __name__ == '__main__':

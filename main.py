@@ -12,8 +12,13 @@ from pyautogui import press, typewrite
 # Our modules
 import testWriteSpecChar as tWSC
 import modetrack
+from vim_environ import VimEnviron
 
-print('Hello, World!')
+# tensorforce modules
+from tensorforce.environments import Environment
+from tensorforce.execution import Runner
+from tensorforce.agents import DeepQNetwork
+
 vim_commands_list = ['h', 'j', 'k', 'l', 'i', 'I', 'a', 'A', 'o', 'O', 's', 'S',
                      '.', 'b', 'db', 'w', 'dw', 'e', 'de', 'yy', 'p', 'x',
                      ':']
@@ -129,89 +134,127 @@ class environment:
         return
 
 
-def main(attempts, start_file, end_file, scriptout):
-    # Iterate over the number of attempts
-    for i in range(0, attempts):
-        # Create environment with the contents of the start file
-        env = environment(start_file, end_file)
-        q = queue.Queue()
-        golfing = True
+def main(repeat, max_episode_timesteps):
+    environment = Environment.create(environment=VimEnviron)
+    for _ in range(repeat, max_episode_timesteps):
+        agent_kwargs = dict()
+        if max_episode_timesteps is not None:
+            assert environment.max_episode_timesteps() is None or \
+                environment.max_episode_timesteps() == max_episode_timesteps
+            agent_kwargs['max_episode_timesteps'] = max_episode_timesteps
+        agent = Agent.create(agent=DeepQNetwork, environment=environment, **agent_kwargs)
+#        print(agent)
+#        agent.initialize()
+#        agent.reset()
+#        actions = agent.act(environment.reset())
+#        print(actions)
+#        states, terminal, reward = environment.execute(actions=actions)
+#        print(states, terminal, reward)
+#        agent.observe(terminal=terminal, reward=reward)
+#        actions = agent.act(states)
+#        print(actions)
+#        states, terminal, reward = environment.execute(actions=actions)
+#        print(states, terminal, reward)
+#        agent.observe(terminal=terminal, reward=reward)
+#        actions = agent.act(states)
+#        print(actions)
+#        states, terminal, reward = environment.execute(actions=actions)
+#        print(states, terminal, reward)
+#        agent.observe(terminal=terminal, reward=reward)
+#        return
 
-        # For reference/testing
-        #master_command_list = ['i', '`esc', 'd', 'd', 'y', 'y', 'p', 'f', '-', 'i', '`bac', '`bac', '`bac', '`esc', ':', 'q', '!', '`ent', 'DONE']
-        master_command_list = ['d', 'j', 'q', 'q', 'f', ',', 'r', '`ent', 'q', '2', '@', 'q', 'l', 'x', 'j', '3', '@', 'q', 'd', 'd', '3', '@', 'q', 'd', 'd']
-        for command in master_command_list:
-            q.put(command)
-
-        command_list = [] 
-        same_files = False
-        while golfing:
-            if command_list:
-                tempfile = env.setup()
-                #time.sleep(1)
-                print('Number of commands (cost):  {}'.format(len(command_list)))
-
-                # Create the script in here
-                command_string = ''.join(command_list)
-                scriptin = 'scriptin'
-                tWSC.writeChars(scriptin, command_string)
-#                with(open('scriptin', 'r')) as f:
-#                    for line in f:
-#                        print(line)
-                modelist = modetrack.fun(command_list)
-                print(command_list)
-                print(modelist)
-
-                # Run through the commands
-#                vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
-#                vimgolf.start()
-                subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout])
-
-                # Check if files are the same
-                same_files = env.fileCompare()
-
-                print('=================Start of File=================')
-                os.system('more {}'.format(tempfile.name))
-                print('==================End of File==================')
-                env.cleanUp()
-
-
-            coords = []
-            if command_list:
-                with open('posout', 'r') as posfile:
-                    for line in posfile:
-                        line = line.strip()
-                        if line:
-                            coords.append(line)
-            else:
-                coords.append(1)
-                coords.append(1)
-            print('Ending coords: {}\n\n'.format(coords))
-
-            # Get a new command if queue is empty
-            if q.empty():
-                if same_files:
-                    next_command = 'DONE'
-                else:
-                    next_command = env.getAction()
-            # Fetch one from the queue
-            else:
-                next_command = q.get()
-            command_list.append(next_command)
-            
-            if next_command == 'DONE':
-                golfing = False
-
-        # Final Output
-        print('\nFinal Output for iteration {}'.format(i))
-        print('Number of commands (cost):  {}'.format(len(command_list) + 1))
-        print('AI\'s commands:')
-        print(command_list)
-
-            # For reference
-        #    press('Esc')
-        #    typewrite(':w | :set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
-        #    press('enter')
+        runner = Runner(agent=agent, environment=environment)
+        runner.run(
+            num_timesteps=args.timesteps, num_episodes=args.episodes,
+            max_episode_timesteps=args.max_episode_timesteps, callback=callback,
+            mean_horizon=args.mean_horizon, evaluation=args.evaluation
+            # save_best_model=args.save_best_model
+        )
+        runner.close()
+    
+#
+#    # Iterate over the number of attempts
+#    for i in range(0, attempts):
+#        # Create environment with the contents of the start file
+#        env = environment(start_file, end_file)
+#        q = queue.Queue()
+#        golfing = True
+#
+#        # For reference/testing
+#        #master_command_list = ['i', '`esc', 'd', 'd', 'y', 'y', 'p', 'f', '-', 'i', '`bac', '`bac', '`bac', '`esc', ':', 'q', '!', '`ent', 'DONE']
+#        master_command_list = ['d', 'j', 'q', 'q', 'f', ',', 'r', '`ent', 'q', '2', '@', 'q', 'l', 'x', 'j', '3', '@', 'q', 'd', 'd', '3', '@', 'q', 'd', 'd']
+#        for command in master_command_list:
+#            q.put(command)
+#
+#        command_list = [] 
+#        same_files = False
+#        while golfing:
+#            if command_list:
+#                tempfile = env.setup()
+#                #time.sleep(1)
+#                print('Number of commands (cost):  {}'.format(len(command_list)))
+#
+#                # Create the script in here
+#                command_string = ''.join(command_list)
+#                scriptin = 'scriptin'
+#                tWSC.writeChars(scriptin, command_string)
+##                with(open('scriptin', 'r')) as f:
+##                    for line in f:
+##                        print(line)
+#                modelist = modetrack.fun(command_list)
+#                print(command_list)
+#                print(modelist)
+#
+#                # Run through the commands
+##                vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
+##                vimgolf.start()
+#                subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout])
+#
+#                # Check if files are the same
+#                same_files = env.fileCompare()
+#
+#                print('=================Start of File=================')
+#                os.system('more {}'.format(tempfile.name))
+#                print('==================End of File==================')
+#                env.cleanUp()
+#
+#
+#            coords = []
+#            if command_list:
+#                with open('posout', 'r') as posfile:
+#                    for line in posfile:
+#                        line = line.strip()
+#                        if line:
+#                            coords.append(line)
+#            else:
+#                coords.append(1)
+#                coords.append(1)
+#            print('Ending coords: {}\n\n'.format(coords))
+#
+#            # Get a new command if queue is empty
+#            if q.empty():
+#                if same_files:
+#                    next_command = 'DONE'
+#                else:
+#                    next_command = env.getAction()
+#            # Fetch one from the queue
+#            else:
+#                next_command = q.get()
+#            command_list.append(next_command)
+#            
+#            if next_command == 'DONE':
+#                golfing = False
+#
+#        # Final Output
+#        print('\nFinal Output for iteration {}'.format(i))
+#        print('Number of commands (cost):  {}'.format(len(command_list) + 1))
+#        print('AI\'s commands:')
+#        print(command_list)
+#
+#            # For reference
+#        #    press('Esc')
+#        #    typewrite(':w | :set cmdheight=2 | redir! > posout | echo line(".") | echo col(".") | redir END')
+#        #    press('enter')
 
       
 
@@ -220,4 +263,5 @@ if __name__ == '__main__':
 #    print(sys.argv[2])
 #    print(sys.argv[3])
     #main(sys.argv[1], sys.argv[2], sys.argv[3])
-    main(1, 'start.txt', 'end.txt', 'scriptout')
+    #main(1, 'start.txt', 'end.txt', 'scriptout')
+    main(repeat=300, max_episode_timesteps=500)
