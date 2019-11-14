@@ -71,6 +71,6 @@ def calReward(f1, f2, diffstack, keystrokes):
     diffstack.append(diff2)
     return diff1-diff2-keystrokes,diffstack
    
-s = []   
-s.append(fdiff(startfile,endfile))
-r, s= calReward(tmpfile,endfile,s,1)
+#s = []   
+#s.append(fdiff(startfile,endfile))
+#r, s= calReward(tmpfile,endfile,s,1)

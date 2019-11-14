@@ -4,11 +4,15 @@ import sys, os
 import time
 import filecmp
 import random
+import codecs
 #from multiprocessing import Process
 
 # Our modules
 import testWriteSpecChar as tWSC
 import modetrack
+from rewardCalculate import calReward
+from state2array import state2array
+from text2ASCII import text2AsciiArray
 
 EDITOR = os.environ.get('EDITOR', 'vim')
 
@@ -40,10 +44,16 @@ class VimGolfer():
                      ]
         self.actions_num = len(self.commands)
         a = 1
+
         #self.states = {'type' : 'int', 'shape' : 4, 'num_values' : 256}
         self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
         num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80),\
         'dictPrevActions' : dict(type='int', shape=100, num_values=len(self.commands))}
+        text_list = []
+        with open(self.start_file, 'r') as file:
+            for line in file:
+                text_list.append(line)
+        self.text_list = text_list
         self.command_list = []
         self.reset()
 
@@ -55,12 +65,21 @@ class VimGolfer():
 
     # Reset the environment
     def reset(self):
-        text_list = []
-        with open(self.start_file, 'r') as file:
-            for line in file:
-                text_list.append(line)
-        self.text_list = text_list
-        self.command_list = []
+        vim_array = state2array('posout.txt', 'modeout.txt', 3)
+        print(vim_array)
+        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 10, 10)
+        print(start_file_array)
+        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
+        state = vim_array + start_file_array.flatten()
+        print(state)
+
+    def getState(self):
+        vim_array = state2array('posout.txt', 'modeout.txt', 3)
+        print(vim_array)
+        temp_file_array = text2AsciiArray(codecs.open(self.tempfile, 'r', 'utf-8').read(), 10, 10)
+        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
+        state = vim_array + temp_file_array.flatten()
+        print(state)
 
     def setup(self):
         with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
@@ -71,7 +90,7 @@ class VimGolfer():
         return tmp
 
     def runVim(self):
-        # Create temporary file with the contents of the start file
+        # Setup the tempfile
         tempfile = self.setup()
 
         # For reference/testing
@@ -101,7 +120,7 @@ class VimGolfer():
 
         coords = []
         if self.command_list:
-            with open('posout', 'r') as posfile:
+            with open('posout.txt', 'r') as posfile:
                 for line in posfile:
                     line = line.strip()
                     if line:
@@ -117,8 +136,8 @@ class VimGolfer():
         #    press('enter')
 
     # Return a reward for an action given a state
-    def getReward(self, state):
-        pass
+    def getReward(self, temp_file):
+        reward, diffstack = calReward(temp_file, self.end_file)
 
     # Return an action for a given state
     def getAction(self, mode):
@@ -158,9 +177,9 @@ class VimGolfer():
         self.command_list.append(action)
         self.runVim()
         # Temp value for state
-        state = 0
+        state = getState()
         # Get a reward
-        reward = self.getReward(state)
+        reward, diffstack = self.getReward()
         terminal = self.fileCompare()
         self.cleanUp()
         return state, reward, terminal
