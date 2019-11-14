@@ -40,10 +40,10 @@ class VimGolfer():
                      ]
         self.actions_num = len(self.commands)
         a = 1
-
-        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_states=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
-        num_states=256), 'dictMode' : dict(type='int', shape=1, num_states=4), 'dictCursor' : dict(type='int', shape=2, num_states=80),\
-        'dictPrevActions' : dict(type='int', shape=100, num_states=len(self.commands))}
+        #self.states = {'type' : 'int', 'shape' : 4, 'num_values' : 256}
+        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
+        num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80),\
+        'dictPrevActions' : dict(type='int', shape=100, num_values=len(self.commands))}
         self.command_list = []
         self.reset()
 

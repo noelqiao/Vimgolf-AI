@@ -62,8 +62,8 @@ class VimEnviron(Environment):
         return self.environment.states
 
     def actions(self):
-        print(dict(type='int', num_actions=self.environment.actions_num))
-        return dict(type='int', num_actions=self.environment.actions_num)
+        print(dict(type='int', num_values=self.environment.actions_num))
+        return dict(type='int', num_values=self.environment.actions_num)
 
     def close(self):
         self.environment.reset()

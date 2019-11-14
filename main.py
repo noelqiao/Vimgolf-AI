@@ -7,7 +7,6 @@ import time
 import filecmp
 import random
 from multiprocessing import Process
-from pyautogui import press, typewrite
 
 # Our modules
 import testWriteSpecChar as tWSC
@@ -16,7 +15,9 @@ from vim_environ import VimEnviron
 
 # tensorforce modules
 from tensorforce.environments import Environment
+from tensorforce.environments import MazeExplorer
 from tensorforce.execution import Runner
+from tensorforce.agents import Agent
 from tensorforce.agents import DeepQNetwork
 
 vim_commands_list = ['h', 'j', 'k', 'l', 'i', 'I', 'a', 'A', 'o', 'O', 's', 'S',
@@ -135,14 +136,16 @@ class environment:
 
 
 def main(repeat, max_episode_timesteps):
-    environment = Environment.create(environment=VimEnviron)
+    v = VimEnviron('OneNumberPerLine')
+    environment = Environment.create(environment=v)
     for _ in range(repeat, max_episode_timesteps):
         agent_kwargs = dict()
         if max_episode_timesteps is not None:
             assert environment.max_episode_timesteps() is None or \
                 environment.max_episode_timesteps() == max_episode_timesteps
             agent_kwargs['max_episode_timesteps'] = max_episode_timesteps
-        agent = Agent.create(agent=DeepQNetwork, environment=environment, **agent_kwargs)
+#DeepQNetwork
+        agent = Agent.create(agent='ppo1.json', environment=environment, **agent_kwargs)
 #        print(agent)
 #        agent.initialize()
 #        agent.reset()
@@ -165,10 +168,11 @@ def main(repeat, max_episode_timesteps):
 
         runner = Runner(agent=agent, environment=environment)
         runner.run(
-            num_timesteps=args.timesteps, num_episodes=args.episodes,
-            max_episode_timesteps=args.max_episode_timesteps, callback=callback,
-            mean_horizon=args.mean_horizon, evaluation=args.evaluation
+            num_timesteps=100, num_episodes=1,
+            max_episode_timesteps=100#, callback=callback,
+            #mean_horizon=args.mean_horizon, evaluation=args.evaluation
             # save_best_model=args.save_best_model
+            #Changed to 100 and 1
         )
         runner.close()
     
