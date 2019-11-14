@@ -45,23 +45,21 @@ class VimEnviron(Environment):
 
         return list(range(len(mazeexp.engine.config.modes)))
 
-    def __init__(self, challenge, visualize=False):
+    def __init__(self, challenge, visualize=False, numSteps=None):
         import vimexp
 
         #assert level in MazeExplorer.levels()
 
         #self.environment = mazeexp.MazeExplorer(mode_id=level, visible=visualize)
         self.environment = vimexp.VimGolfer(challenge=challenge, visible=visualize)
+		self.num_steps = numSteps
 
     def __str__(self):
         return super().__str__() + '({})'.format(self.environment.mode_id)
 
     def states(self):
-        if self.environment.observation_chans > 1:
-            shape = (self.environment.observation_num, self.environment.observation_chans)
-        else:
-            shape = (self.environment.observation_num,)
-        return dict(type='float', shape=shape)
+       
+        return self.environment.states
 
     def actions(self):
         print(dict(type='int', num_actions=self.environment.actions_num))
@@ -77,6 +75,9 @@ class VimEnviron(Environment):
     def execute(self, actions):
         state, reward, terminal, _ = self.environment.act(action=actions)
         return state, terminal, reward
+	def max_episode_timesteps(self):
+		return self.num_steps
+
 
 if __name__ == '__main__':
     vim_environ = VimEnviron('OneNumberPerLine')
