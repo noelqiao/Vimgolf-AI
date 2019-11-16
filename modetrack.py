@@ -1,5 +1,11 @@
 #!/usr/bin/python3
 
+# Tensorforce needs integer representation of our states
+# These are our number representations of the vim modes
+# normal mode = 0
+# insert mode = 1
+# visual mode = 2
+# command mode = 3
 def fun(keystrokes): 
     # requires input to be in the form of a list like ['i', ':', '<Esc>']
     v2i = ['a', 'A', 'i', 'I', 'o', 'O', 's', 'S']

@@ -65,7 +65,9 @@ def fdiff(fp1, fp2):
             diff = diff + len2
     return diff
 
-def calReward(f1, f2, diffstack, keystrokes):
+def calReward(f1, f2, keystrokes):
+    diffstack = []
+    diffstack.append(fdiff(f1, f2))
     diff1 = diffstack[len(diffstack)-1]
     diff2 = fdiff(f1,f2)
     diffstack.append(diff2)

@@ -5,6 +5,7 @@ import time
 import filecmp
 import random
 import codecs
+import numpy as np
 #from multiprocessing import Process
 
 # Our modules
@@ -43,6 +44,7 @@ class VimGolfer():
                      '`bac', '`ent', '`esc', 'dw', 'dd', 'db', 'de', 'yy'
                      ]
         self.actions_num = len(self.commands)
+        self.modelist = [0]
         a = 1
 
         #self.states = {'type' : 'int', 'shape' : 4, 'num_values' : 256}
@@ -65,21 +67,24 @@ class VimGolfer():
 
     # Reset the environment
     def reset(self):
-        vim_array = state2array('posout.txt', 'modeout.txt', 3)
-        print(vim_array)
+        vim_array = state2array([0, 0], self.modelist)
         start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 10, 10)
-        print(start_file_array)
         end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
-        state = vim_array + start_file_array.flatten()
-        print(state)
+        state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
+        return state
 
     def getState(self):
-        vim_array = state2array('posout.txt', 'modeout.txt', 3)
-        print(vim_array)
-        temp_file_array = text2AsciiArray(codecs.open(self.tempfile, 'r', 'utf-8').read(), 10, 10)
+        coords = []
+        with open('posout.txt', 'r') as posfile:
+            for line in posfile:
+                line = line.strip()
+                if line:
+                    coords.append(line)
+        vim_array = state2array(coords, self.modelist)
+        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), 10, 10)
         end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
-        state = vim_array + temp_file_array.flatten()
-        print(state)
+        state = np.concatenate((vim_array, temp_file_array.flatten()), axis=None)
+        return state
 
     def setup(self):
         with tempfile.NamedTemporaryFile(suffix='tmp', delete=False) as tmp:
@@ -101,9 +106,9 @@ class VimGolfer():
         command_string = ''.join(self.command_list)
         scriptin = 'scriptin'
         tWSC.writeChars(scriptin, command_string)
-        modelist = modetrack.fun(self.command_list)
+        self.modelist = modetrack.fun(self.command_list)
         print(self.command_list)
-        print(modelist)
+        print(self.modelist)
 
 # Legacy code for multiprocess. 
 #                vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
@@ -136,27 +141,29 @@ class VimGolfer():
         #    press('enter')
 
     # Return a reward for an action given a state
-    def getReward(self, temp_file):
-        reward, diffstack = calReward(temp_file, self.end_file)
+    def getReward(self):
+        reward, diffstack = calReward(self.tempfile.name, self.end_file, len(self.command_list))
+        return reward, diffstack
 
     # Return an action for a given state
-    def getAction(self, mode):
+    def getAction(self, state, reward):
+        mode = state[2]
+        # NOTE: mode = 0 is TEMPORARY UNTIL MODETRACK IS FIXED
+        mode = 0
         # Random percent chance of choosing an action for exploration
-        if random.random() <= 0.10:
-            rand_index = random.randint(0, len(mode))
-            if mode == 'v':
-                action = self.visual_mode[rand_index]
-            if mode == 'n':
-                action = self.normal_mode[rand_index]
-            if mode == 'i':
-                action = self.insertion_mode[rand_index]
-            if mode == 'c':
-                action = self.command_mode[rand_index]
+        if random.random() <= 0.50:
+#            if mode == 2:
+#                action = self.visual_mode[random.randint(0, len(self.visual_mode))]
+#            if mode == 0:
+#                action = self.normal_mode[random.randint(0, len(self.normal_mode))]
+#            if mode == 1:
+#                action = self.insertion_mode[random.randint(0, len(self.insertion_mode))]
+#            if mode == 3:
+#                action = self.command_mode[random.randint(0, len(self.command_mode))]
+            action = self.commands[random.randint(0, len(self.commands)-1)]
         # Else, use a method based around cost/etc
         else:
-            pass
-        print(rand_index)
-        print(action)
+            return 'I'
         return action
 
     def fileCompare(self):
@@ -177,7 +184,7 @@ class VimGolfer():
         self.command_list.append(action)
         self.runVim()
         # Temp value for state
-        state = getState()
+        state = self.getState()
         # Get a reward
         reward, diffstack = self.getReward()
         terminal = self.fileCompare()
@@ -189,4 +196,17 @@ if __name__ == '__main__':
     vim_inst = VimGolfer('OneNumberPerLine')
     print(vim_inst.start_file)
     print(vim_inst.end_file)
-    vim_inst.act('i')
+    vim_inst.reset()
+    state, reward, terminal = vim_inst.act('i')
+    print(state)
+    print(reward)
+    print(terminal)
+    action = vim_inst.getAction(state, reward)
+    print(action)
+    for i in range(20):
+        state, reward, terminal = vim_inst.act(action)
+        print(state)
+        print(reward)
+        print(terminal)
+        action = vim_inst.getAction(state, reward)
+        print(action)
