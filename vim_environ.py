@@ -66,15 +66,16 @@ class VimEnviron(Environment):
         return dict(type='int', num_values=self.environment.actions_num)
 
     def close(self):
-        self.environment.reset()
+        self.environment.cleanUp()
         self.environment = None
 
     def reset(self):
         return self.environment.reset()
 
     def execute(self, actions):
-        state, reward, terminal, _ = self.environment.act(action=actions)
+        state, reward, terminal = self.environment.act(action=actions)
         return state, terminal, reward
+
     def max_episode_timesteps(self):
         return self.num_steps
 

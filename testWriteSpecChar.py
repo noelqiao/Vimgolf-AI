@@ -23,7 +23,7 @@ def writeChars(theFile,text):
             s = s + text[ite]
         ite += 1
     s = s + u"\u001b"#escape
-    s = s + ":w | set cmdheight=3 | redir! > posout | echo line('.') | echo col('.') | redir END"
+    s = s + ":w | set cmdheight=3 | redir! > posout.txt | echo line('.') | echo col('.') | redir END"
     s = s + u"\u000d"#carriage return
     s = s + ":q"
     s = s + u"\u000d"#carriage return
