@@ -48,9 +48,13 @@ class VimGolfer():
         a = 1
 
         #self.states = {'type' : 'int', 'shape' : 4, 'num_values' : 256}
+        #self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
+        #num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80),\
+        #'dictPrevActions' : dict(type='int', shape=100, num_values=len(self.commands))}
+        
         self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
-        num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80),\
-        'dictPrevActions' : dict(type='int', shape=100, num_values=len(self.commands))}
+        num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80)}
+        
         text_list = []
         with open(self.start_file, 'r') as file:
             for line in file:
@@ -70,7 +74,11 @@ class VimGolfer():
         vim_array = state2array([0, 0], self.modelist)
         start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 10, 10)
         end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
+
+        
         state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
+        state = {'dictCurrFile' : start_file_array, 'dictEndFile' : end_file_array, 'dictMode' : vim_array[2], 'dictCursor' : [0,0]}
+
         return state
 
     def getState(self):
