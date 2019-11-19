@@ -45,7 +45,6 @@ class VimGolfer():
             for line in file:
                 text_list.append(line)
         self.text_list = text_list
-        self.command_list = []
         self.reset()
 
     def getChallenge(self, challenge):
@@ -56,10 +55,12 @@ class VimGolfer():
 
     # Reset the environment
     def reset(self):
+        self.command_list = []
         vim_array = state2array([0, 0], self.modelist)
         start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 10, 10)
         end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
         state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
+
         return state
 
     def getState(self):
