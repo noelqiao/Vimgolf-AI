@@ -45,8 +45,8 @@ class VimGolfer():
         
 #        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
 #        num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80)}
-        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=258), 'dictEndFile' : dict(type='int', shape=(80*80),\
-        num_values=258), 'dictState' : dict(type='int', shape=3, num_values=80)}
+        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=259), 'dictEndFile' : dict(type='int', shape=(80*80),\
+        num_values=259), 'dictState' : dict(type='int', shape=3, num_values=81)}
         
         text_list = []
         with open(self.start_file, 'r') as file:
@@ -184,23 +184,24 @@ class VimGolfer():
 
     def isLegal(self, actions):
         mode = self.modelist[-1]
+        action = self.commands[actions]
         n_illegal = ['K']
         v_illegal = []
         i_illegal = []
         c_illegal = []
         if mode == 0:
-            if actions in n_illegal:
+            if action in n_illegal:
                 return False
         elif mode == 1:
-            if actions in i_illegal:
+            if action in i_illegal:
                 return False
         elif mode == 2:
-            if actions in v_illegal:
+            if action in v_illegal:
                 return False
         elif mode == 3:
-            if actions in c_illegal:
+            if action in c_illegal:
                 return False
-        else: return True
+        return True
 
     def oldState(self):
         state = self.state

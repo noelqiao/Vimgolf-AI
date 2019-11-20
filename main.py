@@ -53,7 +53,7 @@ def main(repeat, max_episode_timesteps):
 
         runner = Runner(agent=agent, environment=environment)
         runner.run(
-            num_timesteps=100, num_episodes=10,
+            num_timesteps=100, num_episodes=1,
             max_episode_timesteps=100#, callback=callback,
             #mean_horizon=args.mean_horizon, evaluation=args.evaluation
             # save_best_model=args.save_best_model
