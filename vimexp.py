@@ -21,17 +21,6 @@ class VimGolfer():
 
     def __init__(self, challenge, visible=False):
         self.start_file, self.end_file = self.getChallenge(challenge)
-#        self.commands = [[' '], ['!'], ['"'], ['#'], ['$'], ['%'], ['&'], ["'"], ['('],
-#                     [')'], ['*'], ['+'], [','], ['-'], ['.'], ['/'], ['0'], ['1'], ['2'], ['3'], ['4'], 
-#                     ['5'], ['6'], ['7'], ['8'], ['9'], [':'], [';'], ['<'], ['='], ['>'], ['?'], ['@'],
-#                     ['['], ['\\'], [']'], ['^'], ['_'], ['`'], ['a'], ['b'], ['c'], ['d'], ['e'],['f'],
-#                     ['g'], ['h'], ['i'], ['j'], ['k'], ['l'], ['m'], ['n'], ['o'], ['p'], ['q'], ['r'],
-#                     ['s'], ['t'], ['u'], ['v'], ['w'], ['x'], ['y'], ['z'], ['{'], ['|'], ['}'], ['~'], 
-#                     ['A'], ['B'], ['C'], ['D'], ['E'],['F'], ['G'], ['H'], ['I'], ['J'], ['K'], ['L'],
-#                     ['M'], ['N'], ['O'], ['P'], ['Q'], ['R'], ['S'], ['T'], ['U'], ['V'], ['W'], ['X'],
-#                     ['Y'], ['Z'],
-#                     ['`bac'], ['`ent'], ['`esc'], ['d', 'w'], ['d', 'd'], ['d', 'b'], ['d', 'e'], ['y', 'y']
-#                     ]
         self.commands = [' ', '!', '"', '#', '$', '%', '&', "'", '(',
                      ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', 
                      '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@',
@@ -60,7 +49,6 @@ class VimGolfer():
             for line in file:
                 text_list.append(line)
         self.text_list = text_list
-        self.command_list = []
         self.reset()
 
     def getChallenge(self, challenge):
@@ -71,6 +59,7 @@ class VimGolfer():
 
     # Reset the environment
     def reset(self):
+        self.command_list = []
         vim_array = state2array([0, 0], self.modelist)
         start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 10, 10)
         end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 10, 10)
@@ -156,8 +145,6 @@ class VimGolfer():
     # Return an action for a given state
     def getAction(self, state, reward):
         mode = state[2]
-        # NOTE: mode = 0 is TEMPORARY UNTIL MODETRACK IS FIXED
-        mode = 0
         # Random percent chance of choosing an action for exploration
         if random.random() <= 0.50:
 #            if mode == 2:
@@ -168,10 +155,10 @@ class VimGolfer():
 #                action = self.insertion_mode[random.randint(0, len(self.insertion_mode))]
 #            if mode == 3:
 #                action = self.command_mode[random.randint(0, len(self.command_mode))]
-            action = self.commands[random.randint(0, len(self.commands)-1)]
+            action = random.randint(0, len(self.commands)-1)
         # Else, use a method based around cost/etc
         else:
-            return 'I'
+            return 47
         return action
 
     def fileCompare(self):
@@ -189,7 +176,7 @@ class VimGolfer():
 
     # Return a tuple (state, reward, terminal)
     def act(self, action):
-        self.command_list.append(action)
+        self.command_list.append(self.commands[action])
         self.runVim()
         # Temp value for state
         state = self.getState()
@@ -202,10 +189,11 @@ class VimGolfer():
 
 if __name__ == '__main__':
     vim_inst = VimGolfer('OneNumberPerLine')
+    print(vim_inst.commands.index('i'))
     print(vim_inst.start_file)
     print(vim_inst.end_file)
     vim_inst.reset()
-    state, reward, terminal = vim_inst.act('i')
+    state, reward, terminal = vim_inst.act(47)
     print(state)
     print(reward)
     print(terminal)
