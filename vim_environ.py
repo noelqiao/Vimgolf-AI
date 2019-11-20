@@ -72,7 +72,11 @@ class VimEnviron(Environment):
         return self.environment.reset()
 
     def execute(self, actions):
-        state, reward, terminal = self.environment.act(action=actions)
+        if self.environment.isLegal(actions):
+            state, reward, terminal = self.environment.act(action=actions)
+        else:
+            state, reward, terminal = self.environment.oldState()
+            reward -= 500
         return state, terminal, reward
 
     def max_episode_timesteps(self):

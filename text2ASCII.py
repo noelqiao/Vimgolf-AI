@@ -6,7 +6,8 @@ def t2a(string):
         arr.append(ord(string[i]))
     return arr
 def ascii2AsciiArray(arr,rows,cols):
-    newArr = np.full((rows,cols), -1)
+    # Initialize as 257
+    newArr = np.full((rows,cols), 257)
     currRow = 0
     currCol = 0
     skipping = False
@@ -19,7 +20,8 @@ def ascii2AsciiArray(arr,rows,cols):
                 currRow += 1
                 currCol = 0
             elif currCol == cols - 1:
-                newArr[currRow,currCol] = -2
+                # If over the size of the array, assign 258 as the last index of that row
+                newArr[currRow,currCol] = 258
                 currRow += 1
                 currCol = 0
                 skipping = True
