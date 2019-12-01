@@ -21,7 +21,8 @@ from tensorforce.agents import Agent
 from tensorforce.agents import DeepQNetwork
 
 def main(repeat, max_episode_timesteps):
-    v = VimEnviron('OneNumberPerLine')
+    #v = VimEnviron('OneNumberPerLine')
+    v = VimEnviron('ViceVersa')
     environment = Environment.create(environment=v)
     for _ in range(repeat, max_episode_timesteps):
         agent_kwargs = dict()
@@ -53,7 +54,7 @@ def main(repeat, max_episode_timesteps):
 
         runner = Runner(agent=agent, environment=environment)
         runner.run(
-            num_timesteps=100, num_episodes=1,
+            num_timesteps=100, num_episodes=100,
             max_episode_timesteps=100#, callback=callback,
             #mean_horizon=args.mean_horizon, evaluation=args.evaluation
             # save_best_model=args.save_best_model
