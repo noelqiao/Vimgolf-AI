@@ -4,6 +4,8 @@ import codecs
 def writeChars(theFile,text):
     f = codecs.open(theFile,"w+", "utf-8")
     s = ""
+    s = s + ":source .vimgolf_vimrc"
+    s = s + u"\u000d"#carriage return
     ite = 0
     while ite < len(text):
         if text[ite] == "`":

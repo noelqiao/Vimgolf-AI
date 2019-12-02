@@ -19,7 +19,7 @@ EDITOR = os.environ.get('EDITOR', 'vim')
 
 class VimGolfer():
 
-    def __init__(self, challenge, visible=False):
+    def __init__(self, challenge, visible=False, legal=True):
         self.start_file, self.end_file = self.getChallenge(challenge)
         self.commands = [' ', '!', '"', '#', '$', '%', '&', "'", '(',
                      ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', 
@@ -36,16 +36,15 @@ class VimGolfer():
         self.actions_num = len(self.commands)
         self.modelist = [0]
         self.reward = 0
+        self.legal = legal
         a = 1
 
-        #self.states = {'type' : 'int', 'shape' : 4, 'num_values' : 256}
-        #self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
-        #num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80),\
-        #'dictPrevActions' : dict(type='int', shape=100, num_values=len(self.commands))}
-        
-#        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=256), 'dictEndFile' : dict(type='int', shape=(80*80),\
-#        num_values=256), 'dictMode' : dict(type='int', shape=1, num_values=4), 'dictCursor' : dict(type='int', shape=2, num_values=80)}
-        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=259), 'dictEndFile' : dict(type='int', shape=(80*80),\
+        self.fileshape_col = 80
+        self.fileshape_row = 3
+
+#        self.states = {'dictCurrFile' : dict(type='int', shape=(80*80), num_values=259), 'dictEndFile' : dict(type='int', shape=(80*80),\
+#        num_values=259), 'dictState' : dict(type='int', shape=3, num_values=81)}
+        self.states = {'dictCurrFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row), num_values=259), 'dictEndFile' : dict(type='int', shape=(80*80),\
         num_values=259), 'dictState' : dict(type='int', shape=3, num_values=81)}
         
         text_list = []
@@ -58,6 +57,8 @@ class VimGolfer():
     def getChallenge(self, challenge):
         if challenge == 'OneNumberPerLine':
             return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
+        if challenge == 'ViceVersa':
+            return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
         else:
             raise ChallengeError('Not a valid challenge')
 
@@ -65,8 +66,10 @@ class VimGolfer():
     def reset(self):
         self.command_list = []
         vim_array = state2array([1, 1], self.modelist)
-        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 80, 80)
-        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
+#        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 80, 80)
+#        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
+        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
+        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
 
         
         state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
@@ -83,8 +86,10 @@ class VimGolfer():
                 if line:
                     coords.append(int(line))
         vim_array = state2array(coords, self.modelist)
-        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), 80, 80)
-        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
+#        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), 80, 80)
+#        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
+        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
+        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
         state = np.concatenate((vim_array, temp_file_array.flatten()), axis=None)
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictMode' : vim_array[2], 'dictCursor' : coords} 
         state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
@@ -183,25 +188,50 @@ class VimGolfer():
         return
 
     def isLegal(self, actions):
+        # Always use i_illegal even when legal is true since any key should be valid in insertion.
         mode = self.modelist[-1]
         action = self.commands[actions]
         n_illegal = ['K']
         v_illegal = []
         i_illegal = []
         c_illegal = []
-        if mode == 0:
-            if action in n_illegal:
-                return False
-        elif mode == 1:
-            if action in i_illegal:
-                return False
-        elif mode == 2:
-            if action in v_illegal:
-                return False
-        elif mode == 3:
-            if action in c_illegal:
-                return False
-        return True
+
+        # Edit-Distance Modified
+        # Delete character, insertion mode
+        n_legal = ['x', 'i', 'd', 'y', 'w', 'h', 'j', 'k', 'l', '`esc']
+        v_legal = []
+        c_legal = []
+
+        if self.legal:
+            if mode == 0:
+                if action in n_illegal:
+                    return False
+            elif mode == 1:
+                if action in i_illegal:
+                    return False
+            elif mode == 2:
+                if action in v_illegal:
+                    return False
+            elif mode == 3:
+                if action in c_illegal:
+                    return False
+            return True
+        else:
+            if mode == 0:
+                if action in n_legal:
+                    return True
+            elif mode == 1:
+                if action in i_legal:
+                    return True
+            elif mode == 2:
+                if action in v_illegal:
+                    return False
+                else:
+                    return True
+            elif mode == 3:
+                if action in c_legal:
+                    return True
+            return False
 
     def oldState(self):
         state = self.state
@@ -220,26 +250,29 @@ class VimGolfer():
         reward, diffstack = self.getReward()
         print('Reward: {}'.format(reward))
         terminal = self.fileCompare()
+        if terminal:
+            print('FOUND SOLUTION: {}'.format(command_list))
         self.cleanUp()
         return state, reward, terminal
 
 
 if __name__ == '__main__':
-    vim_inst = VimGolfer('OneNumberPerLine')
-    print(vim_inst.commands.index('i'))
-    print(vim_inst.start_file)
-    print(vim_inst.end_file)
-    vim_inst.reset()
-    state, reward, terminal = vim_inst.act(47)
-    print(state)
-    print(reward)
-    print(terminal)
-    action = vim_inst.getAction(state, reward)
-    print(action)
-    for i in range(20):
-        state, reward, terminal = vim_inst.act(action)
-        print(state)
-        print(reward)
-        print(terminal)
-        action = vim_inst.getAction(state, reward)
-        print(action)
+    print('Hello, World')
+#    vim_inst = VimGolfer('OneNumberPerLine')
+#    print(vim_inst.commands.index('i'))
+#    print(vim_inst.start_file)
+#    print(vim_inst.end_file)
+#    vim_inst.reset()
+#    state, reward, terminal = vim_inst.act(47)
+#    print(state)
+#    print(reward)
+#    print(terminal)
+#    action = vim_inst.getAction(state, reward)
+#    print(action)
+#    for i in range(20):
+#        state, reward, terminal = vim_inst.act(action)
+#        print(state)
+#        print(reward)
+#        print(terminal)
+#        action = vim_inst.getAction(state, reward)
+#        print(action)
