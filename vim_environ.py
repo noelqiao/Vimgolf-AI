@@ -45,7 +45,7 @@ class VimEnviron(Environment):
 #
 #        return list(range(len(mazeexp.engine.config.modes)))
 
-    def __init__(self, challenge, visualize=False, numSteps=None):
+    def __init__(self, challenge, visualize=False, numSteps=5000):
         import vimexp
 
         #assert level in MazeExplorer.levels()
@@ -61,7 +61,7 @@ class VimEnviron(Environment):
         return self.environment.states
 
     def actions(self):
-        print(dict(type='int', num_values=self.environment.actions_num))
+        #print(dict(type='int', num_values=self.environment.actions_num))
         return dict(type='int', num_values=self.environment.actions_num)
 
     def close(self):

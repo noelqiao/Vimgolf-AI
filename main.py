@@ -54,13 +54,33 @@ def main(repeat, max_episode_timesteps):
 
         runner = Runner(agent=agent, environment=environment)
         runner.run(
-            num_timesteps=100, num_episodes=100,
-            max_episode_timesteps=100#, callback=callback,
+            num_timesteps=40, num_episodes=100, max_episode_timesteps=50,
+            #max_episode_timesteps=100, callback=callback,
             #mean_horizon=args.mean_horizon, evaluation=args.evaluation
             # save_best_model=args.save_best_model
             #Changed to 100 and 1
         )
+        print('Do we keep rerunning')
         runner.close()
+
+# Experimenting with Runner
+#    for _ in range(repeat):
+#        agent_kwargs = dict()
+#        if max_episode_timesteps is not None:
+#            assert environment.max_episode_timesteps() is None or \
+#                environment.max_episode_timesteps() == max_episode_timesteps
+#            agent_kwargs['max_episode_timesteps'] = max_episode_timesteps
+#        agent = Agent.create(agent='ppo1.json', environment=environment, **agent_kwargs)
+#        runner = Runner(agent=agent, environment=environment)
+#        runner.run(
+#            num_timesteps=50, num_episodes=100
+#            #max_episode_timesteps=100, callback=callback,
+#            #mean_horizon=args.mean_horizon, evaluation=args.evaluation
+#            # save_best_model=args.save_best_model
+#            #Changed to 100 and 1
+#        )
+#        print('Do we keep rerunning')
+#        runner.close()
 
 if __name__ == '__main__':
 #    print(sys.argv[1])
@@ -68,4 +88,4 @@ if __name__ == '__main__':
 #    print(sys.argv[3])
     #main(sys.argv[1], sys.argv[2], sys.argv[3])
     #main(1, 'start.txt', 'end.txt', 'scriptout')
-    main(repeat=300, max_episode_timesteps=500)
+    main(repeat=100, max_episode_timesteps=5000)
