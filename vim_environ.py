@@ -45,10 +45,8 @@ class VimEnviron(Environment):
 #
 #        return list(range(len(mazeexp.engine.config.modes)))
 
-    def __init__(self, challenge, visualize=False, numSteps=5000):
+    def __init__(self, challenge, visualize=False, numSteps=30000):
         import vimexp
-
-        #assert level in MazeExplorer.levels()
 
         #self.environment = mazeexp.MazeExplorer(mode_id=level, visible=visualize)
         self.environment = vimexp.VimGolfer(challenge=challenge, visible=visualize)
@@ -72,11 +70,16 @@ class VimEnviron(Environment):
         return self.environment.reset()
 
     def execute(self, actions):
+        #print('EXECUTING')
         if self.environment.isLegal(actions):
+            #print('TAKING ACTION')
             state, reward, terminal = self.environment.act(action=actions)
         else:
+            #print('ILLEGAL MOVE')
             state, reward, terminal = self.environment.oldState()
-            reward -= 500
+            reward -= 50
+        if len(self.environment.command_list) > 50:
+            terminal = True
         return state, terminal, reward
 
     def max_episode_timesteps(self):

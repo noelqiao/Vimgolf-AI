@@ -20,7 +20,7 @@ EDITOR = os.environ.get('EDITOR', 'vim')
 
 class VimGolfer():
 
-    def __init__(self, challenge, visible=False, legal=True):
+    def __init__(self, challenge, visible=False):
         self.start_file, self.end_file = self.getChallenge(challenge)
 #        self.commands = [' ', '!', '"', '#', '$', '%', '&', "'", '(',
 #                     ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', 
@@ -34,12 +34,23 @@ class VimGolfer():
 #                     'Y', 'Z',
 #                     '`bac', '`ent', '`esc', 'dw', 'dd', 'db', 'de', 'yy'
 #                     ]
-        self.commands = [' ', '!', '"', '#', '$', '%', '&', "'", '(',
-                     ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', 
-                     '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@',
-                     '[', '\\', ']', '^', '_', 'a', 'b', 'c', 'd', 'e','f',
+#        self.commands = [' ', '!', '"', '#', '$', '%', '&', "'", '(',
+#                     ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', 
+#                     '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@',
+#                     '[', '\\', ']', '^', '_', 'a', 'b', 'c', 'd', 'e','f',
+#                     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+#                     's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', 
+#                     'A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J', 'K', 'L',
+#                     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+#                     'Y', 'Z',
+#                     '`bac', '`ent', '`esc'
+#                     ]
+        self.commands = [' ', '$', '%',
+                     ',', '.', '0', '1', '2', '3', '4', 
+                     '5', '6', '7', '8', '9', '@',
+                     '^', 'a', 'b', 'c', 'd', 'e','f',
                      'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                     's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', 
+                     's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                      'A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J', 'K', 'L',
                      'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
                      'Y', 'Z',
@@ -48,7 +59,6 @@ class VimGolfer():
         self.actions_num = len(self.commands)
         self.modelist = [0]
         self.reward = 0
-        self.legal = legal
         a = 1
 
         self.fileshape_col = 80
@@ -83,8 +93,8 @@ class VimGolfer():
         history_array = command2AsciiArray([])
 #        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 80, 80)
 #        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
-        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
-        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
+        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), self.fileshape_row, self.fileshape_col)
+        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), self.fileshape_row, self.fileshape_col)
 
         
         state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
@@ -106,8 +116,8 @@ class VimGolfer():
         modetrack_array = self.modelist +  [4] * (50 - len(self.modelist))
 #        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), 80, 80)
 #        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
-        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
-        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), self.fileshape_col, self.fileshape_row)
+        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), self.fileshape_row, self.fileshape_col)
+        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), self.fileshape_row, self.fileshape_col)
         state = np.concatenate((vim_array, temp_file_array.flatten()), axis=None)
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictMode' : vim_array[2], 'dictCursor' : coords} 
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
@@ -136,8 +146,8 @@ class VimGolfer():
         scriptin = 'scriptin'
         tWSC.writeChars(scriptin, command_string)
         self.modelist = modetrack.fun(self.command_list)
-        print(self.command_list)
-        print(self.modelist)
+#        print(self.command_list)
+#        print(self.modelist)
 
 # Legacy code for multiprocess. 
 #                vimgolf = Process(target = lambda: subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout]))
@@ -148,9 +158,9 @@ class VimGolfer():
         #subprocess.call([EDITOR, tempfile.name, '-s', scriptin, '-W', scriptout])
         subprocess.call([EDITOR, tempfile.name, '-s', scriptin])
 
-        print('=================Start of File=================')
-        os.system('more {}'.format(tempfile.name))
-        print('==================End of File==================')
+#        print('=================Start of File=================')
+#        os.system('more {}'.format(tempfile.name))
+#        print('==================End of File==================')
 
         coords = []
         if self.command_list:
@@ -162,7 +172,7 @@ class VimGolfer():
         else:
             coords.append(1)
             coords.append(1)
-        print('Ending coords: {}\n\n'.format(coords))
+        #print('Ending coords: {}\n\n'.format(coords))
 
         # For reference (Things that we must do at the end of executing vim commands, this code is founded)
         #    press('Esc')
@@ -174,24 +184,24 @@ class VimGolfer():
         self.reward, diffstack = calReward(self.tempfile.name, self.end_file, len(self.command_list))
         return self.reward, diffstack
 
-    # Return an action for a given state
-    def getAction(self, state, reward):
-        mode = state[2]
-        # Random percent chance of choosing an action for exploration
-        if random.random() <= 0.50:
-#            if mode == 2:
-#                action = self.visual_mode[random.randint(0, len(self.visual_mode))]
-#            if mode == 0:
-#                action = self.normal_mode[random.randint(0, len(self.normal_mode))]
-#            if mode == 1:
-#                action = self.insertion_mode[random.randint(0, len(self.insertion_mode))]
-#            if mode == 3:
-#                action = self.command_mode[random.randint(0, len(self.command_mode))]
-            action = random.randint(0, len(self.commands)-1)
-        # Else, use a method based around cost/etc
-        else:
-            return 47
-        return action
+#    # Return an action for a given state
+#    def getAction(self, state, reward):
+#        mode = state[2]
+#        # Random percent chance of choosing an action for exploration
+#        if random.random() <= 0.50:
+##            if mode == 2:
+##                action = self.visual_mode[random.randint(0, len(self.visual_mode))]
+##            if mode == 0:
+##                action = self.normal_mode[random.randint(0, len(self.normal_mode))]
+##            if mode == 1:
+##                action = self.insertion_mode[random.randint(0, len(self.insertion_mode))]
+##            if mode == 3:
+##                action = self.command_mode[random.randint(0, len(self.command_mode))]
+#            action = random.randint(0, len(self.commands)-1)
+#        # Else, use a method based around cost/etc
+#        else:
+#            return 47
+#        return action
 
     def fileCompare(self):
         # Check if files are the same
@@ -203,61 +213,43 @@ class VimGolfer():
     def cleanUp(self):
         self.tempfile.close()
         os.remove(self.tempfile.name)
-        print('Closed and removed the temp file')
+        #print('Closed and removed the temp file')
         return
 
     def isLegal(self, actions):
-        # Always use i_illegal even when legal is true since any key should be valid in insertion.
+        # Always use i_illegal since most keys should be valid in insertion.
         mode = self.modelist[-1]
         action = self.commands[actions]
-        n_illegal = ['K']
-        v_illegal = ['`']
-        i_illegal = []
-        c_illegal = []
+        i_illegal = ['`']
 
         # Edit-Distance Modified
         # Delete character, insertion mode
-        n_legal = ['x', 'i', 'd', 'y', 'w', 'h', 'j', 'k', 'l', '`esc']
+        n_legal = ['x', 'i', 'd', 'y', 'w', 'h', 'j', 'k', 'l', '`esc', '`ent']
         v_legal = ['`esc']
         c_legal = ['`esc']
 
-        if not self.legal:
-            if mode == 0:
-                if action in n_illegal:
-                    return False
-            elif mode == 1:
-                if action in i_illegal:
-                    return False
-            elif mode == 2:
-                if action in v_illegal:
-                    return False
-            elif mode == 3:
-                if action in c_illegal:
-                    return False
-            return True
-        else:
-            if mode == 0:
-                if action in n_legal:
-                    return True
-            elif mode == 1:
-                if action in i_illegal:
-                    return False
-                else:
-                    return True
-            elif mode == 2:
-                if action in v_legal:
-                    return True
-            elif mode == 3:
-                if action in c_legal:
-                    return True
-            return False
+        if mode == 0:
+            if action in n_legal:
+                return True
+        elif mode == 1:
+            if action in i_illegal:
+                return False
+            else:
+                return True
+        elif mode == 2:
+            if action in v_legal:
+                return True
+        elif mode == 3:
+            if action in c_legal:
+                return True
+        return False
 
+    # Return the old state if a move is considered illegal
     def oldState(self):
         state = self.state
         reward = self.reward
         terminal = False
         return state, reward, terminal
-
 
     # Return a tuple (state, reward, terminal)
     def act(self, action):
@@ -267,31 +259,9 @@ class VimGolfer():
         state = self.getState()
         # Get a reward
         reward, diffstack = self.getReward()
-        print('Reward: {}'.format(reward))
+        #print('Reward: {}'.format(reward))
         terminal = self.fileCompare()
         if terminal:
             print('FOUND SOLUTION: {}'.format(command_list))
         self.cleanUp()
         return state, reward, terminal
-
-
-if __name__ == '__main__':
-    print('Hello, World')
-#    vim_inst = VimGolfer('OneNumberPerLine')
-#    print(vim_inst.commands.index('i'))
-#    print(vim_inst.start_file)
-#    print(vim_inst.end_file)
-#    vim_inst.reset()
-#    state, reward, terminal = vim_inst.act(47)
-#    print(state)
-#    print(reward)
-#    print(terminal)
-#    action = vim_inst.getAction(state, reward)
-#    print(action)
-#    for i in range(20):
-#        state, reward, terminal = vim_inst.act(action)
-#        print(state)
-#        print(reward)
-#        print(terminal)
-#        action = vim_inst.getAction(state, reward)
-#        print(action)

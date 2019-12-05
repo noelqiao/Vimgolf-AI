@@ -54,7 +54,8 @@ def main(repeat, max_episode_timesteps):
 
         runner = Runner(agent=agent, environment=environment)
         runner.run(
-            num_timesteps=40, num_episodes=100, max_episode_timesteps=50,
+            num_timesteps=40, num_episodes=100,
+            #max_episode_timesteps=50,
             #max_episode_timesteps=100, callback=callback,
             #mean_horizon=args.mean_horizon, evaluation=args.evaluation
             # save_best_model=args.save_best_model

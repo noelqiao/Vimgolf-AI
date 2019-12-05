@@ -33,6 +33,6 @@ def text2AsciiArray(string,rows,cols):
     arr = t2a(string)
     finArr = ascii2AsciiArray(arr,rows,cols)
     return finArr
-#s = codecs.open("test.txt", "r", "utf-8")
+#s = codecs.open("vimgolf_challenges/ViceVersa/start.txt", "r", "utf-8")
 #s = s.read()
-#print(text2AsciiArray(s,10,10))
+#print(text2AsciiArray(s, 3, 80))

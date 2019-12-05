@@ -13,7 +13,7 @@ def state2array(cursor_pos, mode_list):
         #m = f2.readline().strip()
         #a.append(x+y+m)
 
-    print(a)
+    #print(a)
     return a
 
 
