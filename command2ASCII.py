@@ -15,6 +15,3 @@ def command2AsciiArray(command_list):
         else:
             array[index] = ord(command_list[index])
     return array
-#s = codecs.open("test.txt", "r", "utf-8")
-#s = s.read()
-#print(text2AsciiArray(s,10,10))

@@ -23,7 +23,7 @@ def diff(fp1, fp2):
             longest_matching_block = s.find_longest_match(0, len(line1.rstrip()), 0, len(line2.rstrip()))
 #            print(longest_matching_block)
 #            print(longest_matching_block.size)
-            reward += longest_matching_block.size
+            reward += longest_matching_block.size * 0.1
 
             # Find exact matching characters
             correct = 0
@@ -34,14 +34,16 @@ def diff(fp1, fp2):
             for c,d in chars:
                 #print(c, d)
                 if c == d:
-                    correct += 2
+                    correct += 5
             #print(correct)
-            reward += correct
+            reward += correct * 0.1
     return reward
 
 def calReward(f1, f2, keystrokes):
     diff_sim = diff(f1, f2)
-    return diff_sim-keystrokes
+    #return diff_sim-keystrokes
+    #return diff_sim+1
+    return float(diff_sim) + 0.1
 
 #s = calReward("vimgolf_challenges/ViceVersa/start.txt", "vimgolf_challenges/ViceVersa/end.txt", 0)
 #print(s)

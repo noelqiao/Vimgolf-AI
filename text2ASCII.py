@@ -19,6 +19,8 @@ def ascii2AsciiArray(arr,rows,cols):
             currCol += 1
             if val == 10:
                 currRow += 1
+                if currRow >= rows:
+                    break;
                 currCol = 0
             elif currCol == cols - 1:
                 # If over the size of the array, assign 258 as the last index of that row
@@ -26,6 +28,8 @@ def ascii2AsciiArray(arr,rows,cols):
                 currRow += 1
                 currCol = 0
                 skipping = True
+                if currRow >= rows:
+                    break;
         else:
             if arr[i] == 10:
                 skipping = False

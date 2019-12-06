@@ -34,15 +34,23 @@ class VimGolfer():
 #                     'Y', 'Z',
 #                     '`bac', '`ent', '`esc'
 #                     ]
+#        self.commands = [' ', '$', '%',
+#                     ',', '.', '0', '1', '2', '3', '4', 
+#                     '5', '6', '7', '8', '9', '@',
+#                     '^', 'a', 'b', 'c', 'd', 'e','f',
+#                     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+#                     's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+#                     'A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J', 'K', 'L',
+#                     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+#                     'Y', 'Z',
+#                     '`bac', '`ent', '`esc'
+#                     ]
         self.commands = [' ', '$', '%',
                      ',', '.', '0', '1', '2', '3', '4', 
                      '5', '6', '7', '8', '9', '@',
                      '^', 'a', 'b', 'c', 'd', 'e','f',
                      'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
                      's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-                     'A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J', 'K', 'L',
-                     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-                     'Y', 'Z',
                      '`bac', '`ent', '`esc'
                      ]
         self.visible = visible
@@ -52,7 +60,7 @@ class VimGolfer():
 
         # State dictionary format
         self.states = {'dictCurrFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row), num_values=259), 'dictEndFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row),\
-                num_values=259), 'dictState' : dict(type='int', shape=3, num_values=200), 'dictHistory' : dict(type='int', shape=50, num_values=258), 'dictModetrack' : dict(type='int', shape=50, num_values=5)}
+                num_values=259), 'dictState' : dict(type='int', shape=3, num_values=300), 'dictHistory' : dict(type='int', shape=3, num_values=258), 'dictModetrack' : dict(type='int', shape=3, num_values=5)}
         
         text_list = []
         with open(self.start_file, 'r') as file:
@@ -66,6 +74,10 @@ class VimGolfer():
             return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
         if challenge == 'ViceVersa':
             return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
+        if challenge == 'DeleteComment':
+            return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
+        if challenge == 'Blank':
+            return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
         else:
             raise ChallengeError('Not a valid challenge')
 
@@ -73,7 +85,9 @@ class VimGolfer():
     def reset(self):
         self.command_list = []
         self.modelist = [0]
-        self.reward = 0
+        #self.reward = 0
+        self.illegal_move_count = 0
+        self.reward = calReward(self.start_file, self.end_file, len(self.command_list))
         vim_array = state2array([1, 1], self.modelist)
         history_array = command2AsciiArray([])
 #        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 80, 80)
@@ -85,7 +99,7 @@ class VimGolfer():
         state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
         #state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictMode' : np.array(vim_array[2],), 'dictCursor' : [0,0]}
         #state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
-        state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array, 'dictModetrack' : np.full(50, 4).tolist()}
+        state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array[-3:], 'dictModetrack' : np.full(3, 4).tolist()}
         self.state = state
         return state
 
@@ -98,7 +112,7 @@ class VimGolfer():
                     coords.append(int(line))
         vim_array = state2array(coords, self.modelist)
         history_array = command2AsciiArray(self.command_list)
-        modetrack_array = self.modelist +  [4] * (50 - len(self.modelist))
+        modetrack_array = self.modelist[-3:] +  [4] * (3 - len(self.modelist))
 #        temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), 80, 80)
 #        end_file_array = text2AsciiArray(codecs.open(self.end_file, 'r', 'utf-8').read(), 80, 80)
         temp_file_array = text2AsciiArray(codecs.open(self.tempfile.name, 'r', 'utf-8').read(), self.fileshape_row, self.fileshape_col)
@@ -106,7 +120,7 @@ class VimGolfer():
         state = np.concatenate((vim_array, temp_file_array.flatten()), axis=None)
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictMode' : vim_array[2], 'dictCursor' : coords} 
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
-        state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array, 'dictModetrack' : modetrack_array}
+        state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array[-3:], 'dictModetrack' : modetrack_array}
         self.state = state
         return state
 
@@ -161,22 +175,32 @@ class VimGolfer():
 
     # Return a reward for an action given a state
     def getReward(self):
+        # Yunyao
         #self.reward, diffstack = calReward(self.tempfile.name, self.end_file, len(self.command_list))
         #return self.reward, diffstack
+        
+        # New version
         self.reward = calReward(self.tempfile.name, self.end_file, len(self.command_list))
-        if self.visible:
-            print('Reward: {}'.format(self.reward))
+        #new_reward = calReward(self.tempfile.name, self.end_file, len(self.command_list))
+#        reward = new_reward - self.reward
+#        if reward <= 0:
+#            reward = 0
+#        #self.reward += reward
+#        if self.visible:
+#            #print('Reward: {}'.format(self.reward))
+#            print('Reward: {}'.format(reward))
         return self.reward
 
+    # Function for returning illegal reward
     def penalty(self):
-#        self.reward -= 25
-#        return self.reward
-        return -25
+        self.illegal_move_count += 1
+        #return self.reward
+        return 0
 
     def fileCompare(self):
         # Check if files are the same
         if filecmp.cmp(self.tempfile.name, self.end_file):
-            self.reward += 1000
+            self.reward = 10000/len(self.command_list)
             return True
         else:
             return False
@@ -197,7 +221,7 @@ class VimGolfer():
 
         # Edit-Distance Modified
         # Delete character, insertion mode
-        n_legal = ['x', 'i', 'd', 'p', 'u', 'w', 'h', 'j', 'k', 'l', '`esc', '`ent']
+        n_legal = ['x', 'i', 'u', 'w', 'h', 'j', 'k', 'l', '`esc', '`ent']
         v_legal = ['`esc']
         c_legal = ['`esc']
 
@@ -236,6 +260,7 @@ class VimGolfer():
         #print('Reward: {}'.format(reward))
         terminal = self.fileCompare()
         if terminal:
+            reward = self.reward
             print('FOUND SOLUTION: {}'.format(command_list))
         self.cleanUp()
         return state, reward, terminal

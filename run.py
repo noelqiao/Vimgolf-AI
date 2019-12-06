@@ -92,7 +92,9 @@ def main():
             return True
 
     #v = VimEnviron('OneNumberPerLine')
-    v = VimEnviron('ViceVersa', args.visualize)
+    #v = VimEnviron('ViceVersa', args.visualize)
+    #v = VimEnviron('DeleteComment', args.visualize)
+    v = VimEnviron('Blank', args.visualize)
     environment = Environment.create(
         environment=v, max_episode_timesteps=args.max_episode_timesteps
     )

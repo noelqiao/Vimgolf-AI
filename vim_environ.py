@@ -45,7 +45,7 @@ class VimEnviron(Environment):
 #
 #        return list(range(len(mazeexp.engine.config.modes)))
 
-    def __init__(self, challenge, visualize=False, numSteps=30000):
+    def __init__(self, challenge, visualize=False, numSteps=20000):
         import vimexp
 
         #self.environment = mazeexp.MazeExplorer(mode_id=level, visible=visualize)
@@ -78,7 +78,11 @@ class VimEnviron(Environment):
             #print('ILLEGAL MOVE')
             state, reward, terminal = self.environment.oldState()
             reward = self.environment.penalty()
-        if len(self.environment.command_list) > 50:
+            if self.environment.illegal_move_count > 100:
+                print(self.environment.command_list)
+                terminal = True
+        if len(self.environment.command_list) > 10:
+            print(self.environment.command_list)
             terminal = True
         return state, terminal, reward
 
