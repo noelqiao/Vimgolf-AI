@@ -42,6 +42,12 @@ def main():
         '-n', '--network', type=str, default=None,
         help='Network (configuration JSON file, name, or library module)'
     )
+    
+    # Environment arguments
+    parser.add_argument(
+        '--visualize', action='store_true',
+        help='Visualize agent--environment interaction, if supported'
+    )
 
     # Runner arguments
     parser.add_argument('-t', '--timesteps', type=int, default=None, help='Number of timesteps')
@@ -86,7 +92,7 @@ def main():
             return True
 
     #v = VimEnviron('OneNumberPerLine')
-    v = VimEnviron('ViceVersa')
+    v = VimEnviron('ViceVersa', args.visualize)
     environment = Environment.create(
         environment=v, max_episode_timesteps=args.max_episode_timesteps
     )

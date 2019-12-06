@@ -5,6 +5,7 @@ def t2a(string):
     for i in range(0,len(string)):
         arr.append(ord(string[i]))
     return arr
+
 def ascii2AsciiArray(arr,rows,cols):
     # Initialize as 257
     newArr = np.full((rows,cols), 257)
