@@ -1,0 +1,16 @@
+{
+    "agent": "dqn",
+    "network": {"type": "auto", "internal_rnn": false},
+    "memory": 30000,
+    "batch_size": 10,
+    "update_frequency": 4,
+    "learning_rate": 0.001813150053725916,
+    "discount": 0.99,
+    "exploration": 0.01,
+    "l2_regularization": 0.0,
+    "entropy_regularization": 0.0001139309663523798,
+    "saver": {
+        "directory": "savedModel",
+        "fielname": "vimAgent"
+    }
+}
