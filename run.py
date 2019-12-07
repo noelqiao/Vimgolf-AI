@@ -133,18 +133,31 @@ def main():
             import seaborn as sns
             sns.set()
 
-        xs = np.arange(1, len(rewards)+1)
+        xr = np.arange(1, len(rewards)+1)
         min_rewards = np.amin(rewards, axis=1)
         max_rewards = np.amax(rewards, axis=1)
         median_rewards = np.median(rewards, axis=1)
-        ax = plt.figure().gca()
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-        plt.plot(xs, median_rewards, color='green', linewidth=2.0)
-        plt.fill_between(xs, min_rewards, max_rewards, color='green', alpha=0.4)
+        ax1 = plt.figure().gca()
+        ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax1.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        plt.plot(xr, median_rewards, color='green', linewidth=2.0)
+        plt.fill_between(xr, min_rewards, max_rewards, color='green', alpha=0.4)
         plt.xlabel('episodes')
         plt.ylabel('reward')
-        plt.savefig(fname=(args.path + '.png'))
+        plt.savefig(fname=(args.path + '_rewards.png'))
+        
+        xt = np.arange(1, len(timesteps)+1)
+        min_timesteps = np.amin(timesteps, axis=1)
+        max_timesteps = np.amax(timesteps, axis=1)
+        median_timesteps = np.median(timesteps, axis=1)
+        ax2 = plt.figure().gca()
+        ax2.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.plot(xt, median_timesteps, color='green', linewidth=2.0)
+        plt.fill_between(xt, min_timesteps, max_timesteps, color='green', alpha=0.4)
+        plt.xlabel('episodes')
+        plt.ylabel('timesteps')
+        plt.savefig(fname=(args.path + '_timesteps.png'))
 
 
 if __name__ == '__main__':
