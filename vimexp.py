@@ -112,9 +112,10 @@ class VimGolfer():
         coords = []
         with open('posout.txt', 'r') as posfile:
             for line in posfile:
-                line = line.strip()
+                line = line.strip().split()
                 if line:
-                    coords.append(int(line))
+                    coords.append(int(line[0]))
+                    coords.append(int(line[1]))
         vim_array = state2array(coords, self.modelist)
         history_array = command2AsciiArray(self.command_list)
         modetrack_array = self.modelist[-3:] +  [4] * (3 - len(self.modelist))
