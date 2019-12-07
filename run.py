@@ -29,6 +29,8 @@ from vim_environ import VimEnviron
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import FormatStrFormatter
 
 
 def main():
@@ -131,10 +133,13 @@ def main():
             import seaborn as sns
             sns.set()
 
-        xs = np.arange(len(rewards))
+        xs = np.arange(1, len(rewards)+1)
         min_rewards = np.amin(rewards, axis=1)
         max_rewards = np.amax(rewards, axis=1)
         median_rewards = np.median(rewards, axis=1)
+        ax = plt.figure().gca()
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
         plt.plot(xs, median_rewards, color='green', linewidth=2.0)
         plt.fill_between(xs, min_rewards, max_rewards, color='green', alpha=0.4)
         plt.xlabel('episodes')
