@@ -15,8 +15,13 @@
         "num_steps": 10
     },
     "preprocessing": null,
-    "exploration": 0.0,
+    "exploration": 0.05,
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
-    "entropy_regularization": 0.0011393096635237982
+    "entropy_regularization": 0.0011393096635237982,
+    "saver" : {
+        "directory" : "savedModelPPO",
+        "filename" : "vimAgentPPO",
+        "frequency" : 120
+    }
 }

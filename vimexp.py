@@ -59,8 +59,12 @@ class VimGolfer():
         self.fileshape_row = 3
 
         # State dictionary format
+#        self.states = {'dictCurrFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row), num_values=259), 'dictEndFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row),\
+#                num_values=259), 'dictState' : dict(type='int', shape=3, num_values=300), 'dictHistory' : dict(type='int', shape=3, num_values=258), 'dictModetrack' : dict(type='int', shape=3, num_values=5)}
+
+        # Without History
         self.states = {'dictCurrFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row), num_values=259), 'dictEndFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row),\
-                num_values=259), 'dictState' : dict(type='int', shape=3, num_values=300), 'dictHistory' : dict(type='int', shape=3, num_values=258), 'dictModetrack' : dict(type='int', shape=3, num_values=5)}
+                num_values=259), 'dictState' : dict(type='int', shape=3, num_values=300)}
         
         text_list = []
         with open(self.start_file, 'r') as file:
@@ -99,7 +103,8 @@ class VimGolfer():
         state = np.concatenate((vim_array, start_file_array.flatten()), axis=None)
         #state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictMode' : np.array(vim_array[2],), 'dictCursor' : [0,0]}
         #state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
-        state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array[-3:], 'dictModetrack' : np.full(3, 4).tolist()}
+        #state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array[-3:], 'dictModetrack' : np.full(3, 4).tolist()}
+        state = {'dictCurrFile' : start_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
         self.state = state
         return state
 
@@ -120,7 +125,8 @@ class VimGolfer():
         state = np.concatenate((vim_array, temp_file_array.flatten()), axis=None)
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictMode' : vim_array[2], 'dictCursor' : coords} 
         #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
-        state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array[-3:], 'dictModetrack' : modetrack_array}
+        #state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array, 'dictHistory' : history_array[-3:], 'dictModetrack' : modetrack_array}
+        state = {'dictCurrFile' : temp_file_array.flatten(), 'dictEndFile' : end_file_array.flatten(), 'dictState' : vim_array}
         self.state = state
         return state
 
@@ -261,6 +267,6 @@ class VimGolfer():
         terminal = self.fileCompare()
         if terminal:
             reward = self.reward
-            print('FOUND SOLUTION: {}'.format(command_list))
+            print('FOUND SOLUTION: {}'.format(self.command_list))
         self.cleanUp()
         return state, reward, terminal
