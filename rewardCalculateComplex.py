@@ -16,12 +16,16 @@ def t2a(string):
 
 def diff(fp1, fp2):
     reward = 0
+    extra_line_count = 0
     with open(fp1) as f1, open(fp2) as f2:
-        for line1, line2 in zip(f1, f2):
-            # Example scoring
-            #line1 = 'ABC'
-            #line2 = '1ABC' # score 
-            #line2 = 'A12' # score 
+        for line1, line2 in zip_longest(f1, f2):
+            #print(line1, line2)
+            if line1 == None:
+                line1 = ""
+                extra_line_count += 1
+            if line2 == None:
+                line2 = ""
+                extra_line_count += 1
 
             # Find longest matching block
             s = SequenceMatcher(None, line1.rstrip(), line2.rstrip())
@@ -47,14 +51,15 @@ def diff(fp1, fp2):
                 else:
                     if chr(c) in alphas and chr(d) in alphas:
                         # Baseline
-                        correct += 2
+                        #correct += 2
 
                         # Test distance from each other in alphabet.
                         # Range [1, 3]
-#                        indexa = alphas.index(chr(c))
-#                        indexb = alphas.index(chr(d))
-#                        ind_diff = abs(indexa - indexb)
-#                        corrrect = (2/26) * ind_diff + 1
+                        indexa = alphas.index(chr(c))
+                        indexb = alphas.index(chr(d))
+                        ind_diff = abs(indexa - indexb)
+                        ind_diff = 27 - ind_diff
+                        correct += (((2 * ind_diff) / 26) + 1)
                     elif chr(c) in numbers and chr(d) in numbers:
                         correct += 2
                     elif chr(c) in space and chr(d) in space:
@@ -65,16 +70,23 @@ def diff(fp1, fp2):
             reward += correct * 0.1
 
             # Penalize extra characters
-            penalty = abs(len(line2) - len(line1)) * 0.25
+            penalty = abs(len(line2) - len(line1)) * 0.20
             if reward - penalty > 0.1:
                 reward -= penalty
             else:
                 reward = 0.1
+        # Penalize extra lines
+        penalty = extra_line_count * 0.35
+        if reward - penalty > 0.1:
+            reward -= penalty
+        else:
+            reward = 0.1
     return reward
 
 def calReward(f1, f2, keystrokes):
     diff_sim = diff(f1, f2)
     return float(diff_sim) + 0.1
 
-s = calReward("vimgolf_challenges/Blank/start.txt", "vimgolf_challenges/Blank/end.txt", 0)
-print(s)
+#s = calReward("vimgolf_challenges/Blank/start.txt", "vimgolf_challenges/Blank/end.txt", 0)
+#s = calReward("start.txt", "end.txt", 0)
+#print(s)
