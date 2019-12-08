@@ -61,7 +61,7 @@ def diff(fp1, fp2, max_keystrokes, num_keystrokes):
                 extra_characters = abs(len(line2) - len(line1))
     
     # Calc reward
-    reward += exact_matching * 5
+    reward += exact_matching * 20 
     reward += partial_matching * 2
     reward += 50 / (extra_characters + 1)
     reward += 30 / (abs(max_line_count - min_line_count) + 1)

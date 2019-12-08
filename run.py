@@ -97,7 +97,8 @@ def main():
     #v = VimEnviron('ViceVersa', args.visualize)
     #v = VimEnviron('DeleteComment', args.visualize)
     #v = VimEnviron('Blank_Bear', args.visualize)
-    v = VimEnviron('Bear_Blank', args.visualize)
+    #v = VimEnviron('Bear_Blank', args.visualize)
+    v = VimEnviron('Car', args.visualize)
     environment = Environment.create(
         environment=v, max_episode_timesteps=args.max_episode_timesteps
     )
