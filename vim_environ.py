@@ -78,7 +78,7 @@ class VimEnviron(Environment):
             #print('ILLEGAL MOVE')
             state, reward, terminal = self.environment.oldState()
             reward = self.environment.penalty()
-            if self.environment.illegal_move_count > 100:
+            if self.environment.illegal_move_count > 5:
                 print(self.environment.command_list)
                 terminal = True
         if len(self.environment.command_list) > 10:

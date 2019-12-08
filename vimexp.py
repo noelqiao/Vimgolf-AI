@@ -12,7 +12,8 @@ import numpy as np
 import testWriteSpecChar as tWSC
 import modetrack
 #from rewardCalculate import calReward
-from rewardCalculateAggressive import calReward
+#from rewardCalculateAggressive import calReward
+from rewardCalculateComplex import calReward
 from state2array import state2array
 from text2ASCII import text2AsciiArray
 from command2ASCII import command2AsciiArray
@@ -112,10 +113,12 @@ class VimGolfer():
         coords = []
         with open('posout.txt', 'r') as posfile:
             for line in posfile:
-                line = line.strip().split()
+                #line = line.strip().split()
+                line = line.strip()
                 if line:
-                    coords.append(int(line[0]))
-                    coords.append(int(line[1]))
+#                    coords.append(int(line[0]))
+#                    coords.append(int(line[1]))
+                    coords.append(int(line))
         vim_array = state2array(coords, self.modelist)
         history_array = command2AsciiArray(self.command_list)
         modetrack_array = self.modelist[-3:] +  [4] * (3 - len(self.modelist))
