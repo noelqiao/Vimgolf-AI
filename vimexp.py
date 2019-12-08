@@ -83,7 +83,9 @@ class VimGolfer():
             return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
         if challenge == 'DeleteComment':
             return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
-        if challenge == 'Blank':
+        if challenge == 'Blank_Bear':
+            return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
+        if challenge == 'Bear_Blank':
             return os.path.normpath('vimgolf_challenges/{}/start.txt'.format(challenge)), os.path.normpath('vimgolf_challenges/{}/end.txt'.format(challenge))
         else:
             raise ChallengeError('Not a valid challenge')

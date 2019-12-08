@@ -140,7 +140,7 @@ def main():
         median_rewards = np.median(rewards, axis=1)
         ax1 = plt.figure().gca()
         ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax1.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        #ax1.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
         plt.plot(xr, median_rewards, color='green', linewidth=2.0)
         plt.fill_between(xr, min_rewards, max_rewards, color='green', alpha=0.4)
         plt.xlabel('episodes')
