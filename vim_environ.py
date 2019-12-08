@@ -81,7 +81,7 @@ class VimEnviron(Environment):
             if self.environment.illegal_move_count > 5:
                 print(self.environment.command_list)
                 terminal = True
-        if len(self.environment.command_list) > 10:
+        if len(self.environment.command_list) > self.environment.max_keystrokes:
             print(self.environment.command_list)
             terminal = True
         return state, terminal, reward

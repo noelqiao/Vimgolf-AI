@@ -13,7 +13,8 @@ import testWriteSpecChar as tWSC
 import modetrack
 #from rewardCalculate import calReward
 #from rewardCalculateAggressive import calReward
-from rewardCalculateComplex import calReward
+#from rewardCalculateComplex import calReward
+from rewardCalculateRevamp import calReward
 from state2array import state2array
 from text2ASCII import text2AsciiArray
 from command2ASCII import command2AsciiArray
@@ -58,6 +59,7 @@ class VimGolfer():
         self.actions_num = len(self.commands)
         self.fileshape_col = 80
         self.fileshape_row = 3
+        self.max_keystrokes = 10
 
         # State dictionary format
 #        self.states = {'dictCurrFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row), num_values=259), 'dictEndFile' : dict(type='int', shape=(self.fileshape_col*self.fileshape_row),\
@@ -92,7 +94,7 @@ class VimGolfer():
         self.modelist = [0]
         #self.reward = 0
         self.illegal_move_count = 0
-        self.reward = calReward(self.start_file, self.end_file, len(self.command_list))
+        self.reward = calReward(self.start_file, self.end_file, self.max_keystrokes, len(self.command_list))
         vim_array = state2array([1, 1], self.modelist)
         history_array = command2AsciiArray([])
 #        start_file_array = text2AsciiArray(codecs.open(self.start_file, 'r', 'utf-8').read(), 80, 80)
@@ -190,7 +192,7 @@ class VimGolfer():
         #return self.reward, diffstack
         
         # New version
-        self.reward = calReward(self.tempfile.name, self.end_file, len(self.command_list))
+        self.reward = calReward(self.tempfile.name, self.end_file, self.max_keystrokes, len(self.command_list))
         #new_reward = calReward(self.tempfile.name, self.end_file, len(self.command_list))
 #        reward = new_reward - self.reward
 #        if reward <= 0:

@@ -25,7 +25,6 @@ def diff(fp1, fp2):
                 extra_line_count += 1
             if line2 == None:
                 line2 = ""
-                extra_line_count += 1
 
             # Find longest matching block
             s = SequenceMatcher(None, line1.rstrip(), line2.rstrip())
@@ -51,15 +50,15 @@ def diff(fp1, fp2):
                 else:
                     if chr(c) in alphas and chr(d) in alphas:
                         # Baseline
-                        #correct += 2
+                        correct += 2
 
                         # Test distance from each other in alphabet.
                         # Range [1, 3]
-                        indexa = alphas.index(chr(c))
-                        indexb = alphas.index(chr(d))
-                        ind_diff = abs(indexa - indexb)
-                        ind_diff = 27 - ind_diff
-                        correct += (((2 * ind_diff) / 26) + 1)
+#                        indexa = alphas.index(chr(c))
+#                        indexb = alphas.index(chr(d))
+#                        ind_diff = abs(indexa - indexb)
+#                        ind_diff = 27 - ind_diff
+#                        correct += (((2 * ind_diff) / 26) + 1)
                     elif chr(c) in numbers and chr(d) in numbers:
                         correct += 2
                     elif chr(c) in space and chr(d) in space:
